@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+#  .git/hooks/pre-commit
+#
+
+cd $(git rev-parse --show-toplevel)
+sbt assembly
+git add target/scala-2.12/scala-linter-assembly-0.1.jar

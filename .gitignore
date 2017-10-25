@@ -1,0 +1,10 @@
+.WORKSPACE*
+.idea*
+
+!target/
+target/*
+
+!target/scala-2.12/
+target/scala-2.12/*
+
+!target/scala-2.12/scala-linter-assembly-0.1.jar
