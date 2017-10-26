@@ -2,6 +2,7 @@ package com.rubrik
 
 import com.rubrik.linter.ChainedMethodsLinter
 import com.rubrik.linter.FunctionCallArgsLinter
+import com.rubrik.linter.FunctionDeclarationLinter
 import com.rubrik.linter.LintResult
 import com.rubrik.linter.Linter
 import com.rubrik.linter.MultilineAssignmentLinter
@@ -26,6 +27,7 @@ object LinterApp {
     List(
       ChainedMethodsLinter,
       FunctionCallArgsLinter,
+      FunctionDeclarationLinter,
       MultilineAssignmentLinter)
 
   def main(args: Array[String]): Unit = {

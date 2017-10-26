@@ -1,6 +1,13 @@
 package com.rubrik.linter
 
+import scala.meta.Defn
 import scala.meta.Tree
+import scala.meta.quasiquotes.XtensionQuasiquoteTerm
+import scala.meta.tokens.Token
+import scala.meta.tokens.Token.Colon
+import scala.meta.tokens.Token.LeftParen
+import scala.meta.tokens.Token.RightParen
+import scala.meta.tokens.Tokens
 
 package object util {
 
@@ -21,9 +28,75 @@ package object util {
     trees.toSet[Tree].map(_.pos.startColumn).size <= 1
   }
 
-  def firstNonEmptyToken(tree: Tree): String = {
-    tree.tokens.dropWhile(_.text.isEmpty).head.text
+  def firstNonEmptyToken(tree: Tree): Token = {
+    tree.tokens.dropWhile(_.text.replaceAll("\\s", "").isEmpty).head
   }
 
   def indent(tree: Tree): Int = tree.pos.startColumn
+
+  /**
+    * The [[Tree.tokens]] builtin method returns [[Tokens]],
+    * which is a bit cumbersome to deal with, as it actually
+    * has reference to all the [[Token]]s, even those outside
+    * the tree. This method gives only the [[Token]]s belonging
+    * to the tree.
+    *
+    * @return all the tokens in {{tree}}
+    */
+  private def tokens(tree: Tree): IndexedSeq[Token] = {
+    val tokensObj: Tokens = tree.tokens
+    tokensObj.map(identity)
+  }
+
+  def openingParen(defn: Defn.Def): Option[LeftParen] = {
+    // The first opening parenthesis after name of the function,
+    // Search only up to the first param token.
+    // If no params, search up to first return type token.
+    // If no return type, search up to first body token.
+    val name: Token = defn.name.tokens.head
+    val fromNameOnward: Tokens = defn.tokens.dropWhile(_ != name)
+
+    val paramTokens: Set[Token] = defn.paramss.flatten.flatMap(tokens).toSet
+    val retTypeTokens: Set[Token] = defn.decltpe.map(tokens).toSet.flatten
+    val firstBodyToken: Token = defn.body.tokens.head
+
+    val outOfBoundsTokens: Set[Token] =
+      paramTokens ++ retTypeTokens + firstBodyToken
+
+    fromNameOnward
+      .takeWhile(!outOfBoundsTokens.contains(_))
+      .collectFirst { case paren: LeftParen => paren }
+  }
+
+  def closingParen(defn: Defn.Def): Option[RightParen] = {
+    // The last closing parenthesis just before the first return type token.
+    // If no return type, search up to the first body token.
+    val name: Token = defn.name.tokens.head
+    val fromNameOnward: Tokens = defn.tokens.dropWhile(_ != name)
+
+    val retTypeTokens: Set[Token] = defn.decltpe.map(tokens).toSet.flatten
+    val firstBodyToken: Token = defn.body.tokens.head
+
+    val outOfBoundsTokens: Set[Token] = retTypeTokens + firstBodyToken
+
+    fromNameOnward
+      .takeWhile(!outOfBoundsTokens.contains(_))
+      .reverse
+      .collectFirst { case paren: RightParen => paren }
+  }
+
+  def returnTypeColon(defn: Defn.Def): Option[Colon] = {
+    defn
+      .decltpe
+      .map {
+        retType =>
+          val retTypeToken = retType.tokens.head
+          defn
+            .tokens
+            .takeWhile(_ != retTypeToken)
+            .reverse
+            .collectFirst { case colon: Colon => colon }
+            .get
+      }
+  }
 }

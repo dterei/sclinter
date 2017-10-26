@@ -1,10 +1,13 @@
 package com.rubrik.linter.util
 
+import com.rubrik.linter.CodeSpec
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
+import scala.meta.Defn
 import scala.meta.Stat
 import scala.meta.XtensionParseInputLike
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
+import scala.meta.tokens.Token
 
 class UtilSpec extends FlatSpec with Matchers {
 
@@ -100,4 +103,127 @@ class UtilSpec extends FlatSpec with Matchers {
     indent(blah) shouldBe 2
     indent(bleh) shouldBe 8
   }
+
+
+  behavior of "openingParen"
+
+  it should "fail to find opening paren when there's none" in {
+    UtilSpec.assertOpeningParen { "def foo = bar()" }
+    UtilSpec.assertOpeningParen { "def foo: (Int, Int) = bar()" }
+    UtilSpec.assertOpeningParen { "def foo: () => Int = null" }
+  }
+
+  it should "correctly find opening paren when present" in {
+    UtilSpec.assertOpeningParen {
+      """
+        |def answer() = 42
+        |          ^
+      """
+    }
+    UtilSpec.assertOpeningParen {
+      """
+        |def foo[T](func: (Int, String) => Int): (Int, Int) = null
+        |          ^
+      """
+    }
+    UtilSpec.assertOpeningParen {
+      """
+        |def foo[T]
+        |(arg: Int): Int = null
+        |^
+      """
+    }
+  }
+
+
+  behavior of "closingParen"
+
+  it should "fail to find closing paren when there's none" in {
+    UtilSpec.assertClosingParen { "def foo = bar()" }
+    UtilSpec.assertClosingParen { "def foo: (Int, Int) = bar()" }
+    UtilSpec.assertClosingParen { "def foo: () => Int = null" }
+  }
+
+  it should "correctly find closing paren when present" in {
+    UtilSpec.assertClosingParen {
+      """
+        |def answer() = 42
+        |           ^
+      """
+    }
+    UtilSpec.assertClosingParen {
+      """
+        |def foo[T](func: (Int, String) => Int): (Int, Int) = null
+        |                                     ^
+      """
+    }
+    UtilSpec.assertClosingParen {
+      """
+        |def foo[T](
+        |  arg: Int
+        |): (Int, Int) = null
+        |^
+      """
+    }
+  }
+
+
+  behavior of "returnTypeColon"
+
+  it should "fail to find colon when there's none" in {
+    UtilSpec.assertReturnTypeColon { "def foo = bar()" }
+    UtilSpec.assertReturnTypeColon { "def foo(i: Int, j: Int) = bar()" }
+  }
+
+  it should "correctly find colon before return type when present" in {
+    UtilSpec.assertReturnTypeColon {
+      """
+        |def answer(): Int = 42
+        |            ^
+      """
+    }
+    UtilSpec.assertReturnTypeColon {
+      """
+        |def foo[T: ClassTag](func: (Int, String) => Int): (Int, Int) = null
+        |                                                ^
+      """
+    }
+    UtilSpec.assertReturnTypeColon {
+      """
+        |def foo[T <: Ordered[T]](
+        |  arg: Int
+        |): `weird type name with :` = null
+        | ^
+      """
+    }
+  }
+}
+
+object UtilSpec extends Matchers {
+  private def assertToken(
+    tokenFunc: Defn.Def => Option[Token]
+  )(
+    rawCodeSpec: String
+  ): Unit = {
+    CodeSpec(rawCodeSpec) match {
+      case CodeSpec(defn: Defn.Def, carets) =>
+        if (carets.isEmpty) {
+          tokenFunc(defn) should not be defined
+        } else {
+          // tokens' lines and cols are zero based
+          tokenFunc(defn).get.pos.startLine shouldBe carets.head.line - 1
+          tokenFunc(defn).get.pos.startColumn shouldBe carets.head.col - 1
+        }
+      case _ =>
+    }
+  }
+
+  private def assertOpeningParen(rawCodeSpec: String): Unit =
+    assertToken(openingParen)(rawCodeSpec)
+
+  private def assertClosingParen(rawCodeSpec: String): Unit =
+    assertToken(closingParen)(rawCodeSpec)
+
+  private def assertReturnTypeColon(rawCodeSpec: String): Unit =
+    assertToken(returnTypeColon)(rawCodeSpec)
 }
