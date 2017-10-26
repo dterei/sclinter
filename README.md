@@ -15,8 +15,8 @@ First add this repository as a submodule of the project:
 cd $(git rev-parse --show-toplevel)
 
 # Add submodule
-git submodule add https://github.com/scaledata/sclinter.git .scala-linter
-git submodule update --init
+git submodule add git@github.com:scaledata/sclinter.git .scala-linter
+git submodule update --init --recursive
 ```
 
 Load the linter in `.arcconfig`
