@@ -13,6 +13,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
   behavior of FunctionCallArgsLinter.getClass.getSimpleName.init
 
   it should "not show lint errors for valid code" in {
+    assertLintError { "foo()" }
     assertLintError { "this.foo(arg1, arg2)" }
     assertLintError { "foo(arg1, arg2)" }
     assertLintError {

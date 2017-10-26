@@ -8,17 +8,17 @@ package object util {
     trees
       .toSet[Tree]
       .flatMap(t => Set(t.pos.startLine, t.pos.endLine))
-      .size == 1
+      .size <= 1
   }
 
   def multiline(trees: Tree*): Boolean = !sameLine(trees: _*)
 
   def startOnSameLine(trees: Tree*): Boolean = {
-    trees.toSet[Tree].map(_.pos.startLine).size == 1
+    trees.toSet[Tree].map(_.pos.startLine).size <= 1
   }
 
   def leftAligned(trees: Tree*): Boolean = {
-    trees.toSet[Tree].map(_.pos.startColumn).size == 1
+    trees.toSet[Tree].map(_.pos.startColumn).size <= 1
   }
 
   def firstNonEmptyToken(tree: Tree): String = {
