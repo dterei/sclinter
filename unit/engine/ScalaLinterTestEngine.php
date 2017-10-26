@@ -80,48 +80,42 @@ final class ScalaLinterTestEngine extends ArcanistUnitTestEngine {
       // filename as mentioned in the report is relative to `src/main/scala/`,
       // but it needs to be relative to the project root.
       $relative_path = 'src/main/scala/'.$class->getAttribute('filename');
-
       $absolute_path = Filesystem::resolvePath($relative_path);
 
-      if (!file_exists($absolute_path)) {
-        continue;
-      }
-
       // skip reporting coverage for files that aren't in the diff
-      if (!in_array($relative_path, $paths)) {
-        continue;
-      }
+      if (!in_array($relative_path, $paths)) continue;
+
+      if (!file_exists($absolute_path)) continue;
 
       // get total line count in file
       $line_count = count(file($absolute_path));
 
-      $coverage = '';
-      $start_line = 1;
+      // Each line gets one letter in the coverage string.
+      // $coverage_str[i] represents the coverage state of line i+1.
+      // The letter 'N' means non executable, 'C' means the line has
+      // test coverage, while 'U' means that the line doesn't have
+      // test coverage.
+      $NON_EXEC = 'N';
+      $COVERED = 'C';
+      $NOT_COVERED = 'U';
+
+      // Start out by treating each line as non-executable.
+      $coverage_str = str_repeat($NON_EXEC, $line_count);
+
       $lines = $class->getElementsByTagName('line');
-      for ($ii = 0; $ii < $lines->length; $ii++) {
-        $line = $lines->item($ii);
-
-        $next_line = (int)$line->getAttribute('number');
-        for ($start_line; $start_line < $next_line; $start_line++) {
-            $coverage .= 'N';
+      foreach ($lines as $line) {
+        $line_no = (int)$line->getAttribute('number');
+        $has_coverage = (((int)$line->getAttribute('hits')) != 0);
+        if ($has_coverage) {
+          $coverage_str[$line_no - 1] = $COVERED;
         }
-
-        if ((int)$line->getAttribute('hits') == 0) {
-            $coverage .= 'U';
-        } else if ((int)$line->getAttribute('hits') > 0) {
-            $coverage .= 'C';
-        }
-
-        $start_line++;
-      }
-
-      if ($start_line < $line_count) {
-        foreach (range($start_line, $line_count) as $line_num) {
-          $coverage .= 'N';
+        // Mark the line uncovered only if
+        // it wasn't already marked as covered
+        else if ($coverage_str[$line_no - 1] != $COVERED) {
+          $coverage_str[$line_no - 1] = $NOT_COVERED;
         }
       }
-
-      $reports[$relative_path] = $coverage;
+      $reports[$relative_path] = $coverage_str;
     }
 
     return $reports;
