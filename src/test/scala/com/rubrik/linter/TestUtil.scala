@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.LintResult.Severity
 import org.scalatest.Matchers
 import scala.meta.Stat
 import scala.meta.XtensionParseInputLike
@@ -46,21 +47,35 @@ object TestUtil extends Matchers {
   type LineNo = Int
   type ColNo = Int
 
-  def assertLintError(linter: Linter)(code: String): Unit = {
-    val indentedCode = code.split("\n").map("  " + _).mkString("\n")
-    val pushedDownCode = s"\n$code"
+  trait LintResultInspector {
+    def lintResults: Seq[LintResult]
 
-    List(code, indentedCode, pushedDownCode) foreach {
-      perturbedCode =>
-        val codeSpec = CodeSpec(perturbedCode)
-        val expectedLintErrors: Set[Caret] = codeSpec.carets.toSet
-        val lintErrors: Set[Caret] =
-          linter
-            .lint(codeSpec.code)
-            .map(error => Caret(error.line.get, error.char.get))
-            .toSet
-
-        lintErrors shouldBe expectedLintErrors
+    final def withReplacementTexts(
+      replacements: String*
+    ): LintResultInspector = {
+      lintResults.map(_.replacement) shouldBe replacements.map(Some(_))
+      this
     }
+
+    final def withSeverities(
+      severities: Severity*
+    ): LintResultInspector = {
+      lintResults.map(_.severity) shouldBe severities.map(Some(_))
+      this
+    }
+  }
+
+  def assertLintError(linter: Linter)(code: String): LintResultInspector = {
+    val codeSpec = CodeSpec(code)
+    val expectedCarets: Set[Caret] = codeSpec.carets.toSet
+    val results: Seq[LintResult] = linter.lint(codeSpec.code)
+    val carets: Set[Caret] =
+      results
+        .map(error => Caret(error.line.get, error.char.get))
+        .toSet
+
+    carets shouldBe expectedCarets
+
+    new LintResultInspector { def lintResults: Seq[LintResult] = results }
   }
 }

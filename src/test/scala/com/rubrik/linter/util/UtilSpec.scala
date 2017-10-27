@@ -4,10 +4,14 @@ import com.rubrik.linter.CodeSpec
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 import scala.meta.Defn
+import scala.meta.Member
 import scala.meta.Stat
+import scala.meta.Term
+import scala.meta.Term.ApplyType
 import scala.meta.XtensionParseInputLike
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 import scala.meta.tokens.Token
+import scala.reflect.ClassTag
 
 class UtilSpec extends FlatSpec with Matchers {
 
@@ -197,16 +201,93 @@ class UtilSpec extends FlatSpec with Matchers {
       """
     }
   }
+
+
+  behavior of "leftBracket"
+
+  it should "correctly find left bracket" in {
+    UtilSpec.assertLeftBracket {
+      """
+        |foo[Int]
+        |   ^
+      """
+    }
+    UtilSpec.assertLeftBracket {
+      """
+        |foo [
+        |    ^
+        |  Int
+        |]
+      """
+    }
+    UtilSpec.assertLeftBracket {
+      """
+        |foo [
+        |    ^
+        |   Int]
+      """
+    }
+    UtilSpec.assertLeftBracket {
+      """
+        |foo [Int
+        |    ^
+        |   ]
+      """
+    }
+  }
+
+
+  behavior of "rightBracket"
+
+  it should "correctly find right bracket" in {
+    UtilSpec.assertRightBracket {
+      """
+        |foo[Int]
+        |       ^
+      """
+    }
+    UtilSpec.assertRightBracket {
+      """
+        |foo [
+        |  Int
+        |]
+        |^
+      """
+    }
+    UtilSpec.assertRightBracket {
+      """
+        |foo [
+        |   Int]
+        |      ^
+      """
+    }
+    UtilSpec.assertRightBracket {
+      """
+        |foo [Int
+        |   ]
+        |   ^
+      """
+    }
+  }
 }
 
 object UtilSpec extends Matchers {
-  private def assertToken(
-    tokenFunc: Defn.Def => Option[Token]
+
+  // We want to provide a uniform interface for both Member.Term and Term.
+  // adapted from https://stackoverflow.com/a/3791176/812448
+  sealed abstract class TermLike[-T: ClassTag]
+  object TermLike {
+    implicit object TermOk extends TermLike[Term]
+    implicit object MemberTermOk extends TermLike[Member.Term]
+  }
+
+  private def assertTokenOpt[T: TermLike: ClassTag](
+    tokenFunc: T => Option[Token]
   )(
     rawCodeSpec: String
   ): Unit = {
     CodeSpec(rawCodeSpec) match {
-      case CodeSpec(defn: Defn.Def, carets) =>
+      case CodeSpec(defn: T, carets) =>
         if (carets.isEmpty) {
           tokenFunc(defn) should not be defined
         } else {
@@ -218,12 +299,26 @@ object UtilSpec extends Matchers {
     }
   }
 
+  private def assertToken[T: TermLike: ClassTag](
+    tokenFunc: T => Token
+  )(
+    rawCodeSpec: String
+  ): Unit = {
+    assertTokenOpt[T]((t: T) => Some(tokenFunc(t)))(rawCodeSpec)
+  }
+
   private def assertOpeningParen(rawCodeSpec: String): Unit =
-    assertToken(openingParen)(rawCodeSpec)
+    assertTokenOpt[Defn.Def](openingParen)(rawCodeSpec)
 
   private def assertClosingParen(rawCodeSpec: String): Unit =
-    assertToken(closingParen)(rawCodeSpec)
+    assertTokenOpt[Defn.Def](closingParen)(rawCodeSpec)
 
   private def assertReturnTypeColon(rawCodeSpec: String): Unit =
-    assertToken(returnTypeColon)(rawCodeSpec)
+    assertTokenOpt[Defn.Def](returnTypeColon)(rawCodeSpec)
+
+  private def assertLeftBracket(rawCodeSpec: String): Unit =
+    assertToken[ApplyType](leftBracket)(rawCodeSpec)
+
+  private def assertRightBracket(rawCodeSpec: String): Unit =
+    assertToken[ApplyType](rightBracket)(rawCodeSpec)
 }

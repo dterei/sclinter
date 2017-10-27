@@ -1,6 +1,7 @@
 package com.rubrik
 
 import com.rubrik.linter.ChainedMethodsLinter
+import com.rubrik.linter.ExceptionCatchArticleLinter
 import com.rubrik.linter.FunctionCallArgsLinter
 import com.rubrik.linter.FunctionDeclarationLinter
 import com.rubrik.linter.LintResult
@@ -26,6 +27,7 @@ object LinterApp {
   val linters: List[Linter] =
     List(
       ChainedMethodsLinter,
+      ExceptionCatchArticleLinter,
       FunctionCallArgsLinter,
       FunctionDeclarationLinter,
       MultilineAssignmentLinter)

@@ -1,11 +1,13 @@
 package com.rubrik.linter
 
 import scala.meta.Defn
+import scala.meta.Term.ApplyType
 import scala.meta.Tree
-import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 import scala.meta.tokens.Token
 import scala.meta.tokens.Token.Colon
+import scala.meta.tokens.Token.LeftBracket
 import scala.meta.tokens.Token.LeftParen
+import scala.meta.tokens.Token.RightBracket
 import scala.meta.tokens.Token.RightParen
 import scala.meta.tokens.Tokens
 
@@ -98,5 +100,13 @@ package object util {
             .collectFirst { case colon: Colon => colon }
             .get
       }
+  }
+
+  def leftBracket(expr: ApplyType): LeftBracket = {
+    expr.tokens.collectFirst { case bracket: LeftBracket => bracket }.get
+  }
+
+  def rightBracket(expr: ApplyType): RightBracket = {
+    expr.tokens.collectFirst { case bracket: RightBracket => bracket }.get
   }
 }
