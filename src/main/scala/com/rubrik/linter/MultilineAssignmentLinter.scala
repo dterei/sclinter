@@ -2,6 +2,7 @@ package com.rubrik.linter
 
 import com.rubrik.linter.util.startOnSameLine
 import com.rubrik.linter.util.multiline
+import scala.meta.Term.Block
 import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 
@@ -14,7 +15,14 @@ import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 object MultilineAssignmentLinter extends Linter {
 
   private def invalid(variable: Tree, expr: Tree): Boolean = {
-    multiline(expr) && startOnSameLine(variable, expr)
+    expr match {
+      case _: Block =>
+        // In case of block expressions, we do allow the start
+        // of expression, that is, "{" to be on the same line
+        false
+      case _ =>
+        multiline(expr) && startOnSameLine(variable, expr)
+    }
   }
 
   private def replacementText(variable: Tree, expr: Tree): String = {

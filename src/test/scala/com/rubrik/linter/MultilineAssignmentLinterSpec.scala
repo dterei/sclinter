@@ -15,6 +15,15 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
   it should "not show lint errors for valid code" in {
     assertLintError { "val foo = bar" }
     assertLintError { "val foo = for { i <- list } yield i" }
+    assertLintError {
+      """
+        |val answer = {
+        |  val seven = 7
+        |  val six = 6
+        |  seven * six
+        |}
+      """
+    }
   }
 
   it should "show lint errors for invalid code" in {
