@@ -1,10 +1,11 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): Unit = {
+  private def assertLintError(code: String): LintResultInspector = {
     TestUtil.assertLintError(FunctionDeclarationLinter) {
       code.stripMargin
     }
@@ -104,6 +105,34 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |  x * y
         |}
       """
+    }
+  }
+
+  it should "show lint error for using Unit-returning special syntax" in {
+    assertLintError {
+      """
+        |def greet(name: String) {
+        |    ^
+        |  println(s"hello $name, how are? खाना खा के जाना हाँ!")
+        |}
+      """
+    } withCodes {
+      FunctionDeclarationLinter.ReturnTypeCode
+    }
+
+    assertLintError {
+      s"""
+        |def printAddition(
+        |    ^
+        |  a: Int,
+        |  b: Int
+        |) {
+        |  val result = a + b
+        |  println(result)
+        |}
+      """
+    } withCodes {
+      FunctionDeclarationLinter.ReturnTypeCode
     }
   }
 }

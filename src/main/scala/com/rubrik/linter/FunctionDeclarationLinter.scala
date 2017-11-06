@@ -7,7 +7,7 @@ import com.rubrik.linter.util.returnTypeColon
 import com.rubrik.linter.util.sameLine
 import scala.meta.Defn
 import scala.meta.Tree
-import scala.meta.quasiquotes.XtensionQuasiquoteTerm
+import scala.meta.Type
 
 /**
   * A [[Linter]] for function declarations.
@@ -27,11 +27,14 @@ import scala.meta.quasiquotes.XtensionQuasiquoteTerm
   * Right now, that's not a high priority because people hardly get it wrong.
   */
 object FunctionDeclarationLinter extends Linter {
+  private[linter] val ReverseFrownCode = "FUNDEF-REVERSE-FROWN"
+  private[linter] val ClosingParenIndentCode = "FUNDEF-CLOSING-PAREN-INDENT"
+  private[linter] val ReturnTypeCode = "FUNCTION-RETURN-TYPE"
 
   private def lintResult(defn: Defn.Def): Option[LintResult] = {
     val func = defn.name
-    defn
-      .decltpe
+    util
+      .explicitlySpecifiedReturnType(defn)
       .map {
         returnType =>
           if (sameLine(func, returnType)) {
@@ -45,7 +48,7 @@ object FunctionDeclarationLinter extends Linter {
                   message =
                     "`:` should immediately follow `)`, " +
                       "making a reverse frown like `):`",
-                  code = Some("FUNDEF-REVERSE-FROWN"),
+                  code = Some(ReverseFrownCode),
                   name = Some("Function def reverse-frown"),
                   line = Some(rParen.pos.startLine + 1),
                   char = Some(rParen.pos.startColumn + 1)))
@@ -60,7 +63,7 @@ object FunctionDeclarationLinter extends Linter {
                   message =
                     "`)` should have same indentation as " +
                       s"`${firstNonEmptyToken(defn)}`.",
-                  code = Some("FUNDEF-CLOSING-PAREN-INDENT"),
+                  code = Some(ClosingParenIndentCode),
                   name = Some("Function def closing parenthesis indent"),
                   line = Some(rParen.pos.startLine + 1),
                   char = Some(rParen.pos.startColumn + 1)))
@@ -79,7 +82,7 @@ object FunctionDeclarationLinter extends Linter {
         Some(
           LintResult(
             message = s"Return type not specified for `$func`.",
-            code = Some("FUNCTION-RETURN-TYPE"),
+            code = Some(ReturnTypeCode),
             name = Some("Function return type"),
             line = Some(func.pos.startLine + 1),
             char = Some(func.pos.startColumn + 1)))

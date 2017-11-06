@@ -63,6 +63,13 @@ object TestUtil extends Matchers {
       lintResults.map(_.severity) shouldBe severities.map(Some(_))
       this
     }
+
+    final def withCodes(
+      codes: String*
+    ): LintResultInspector = {
+      lintResults.map(_.code) shouldBe codes.map(Some(_))
+      this
+    }
   }
 
   def assertLintError(linter: Linter)(code: String): LintResultInspector = {

@@ -8,6 +8,7 @@ import scala.meta.Member
 import scala.meta.Stat
 import scala.meta.Term
 import scala.meta.Term.ApplyType
+import scala.meta.Type
 import scala.meta.XtensionParseInputLike
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 import scala.meta.tokens.Token
@@ -268,6 +269,27 @@ class UtilSpec extends FlatSpec with Matchers {
         |   ^
       """
     }
+  }
+
+
+  behavior of "explicitlySpecifiedReturnType"
+
+  it should "return the return type when specified" in {
+    val defn = "def foo(): Unit = {}".parse[Stat].get.asInstanceOf[Defn.Def]
+    val inferredType = defn.decltpe
+    val specifiedType = explicitlySpecifiedReturnType(defn)
+
+    inferredType shouldBe defined
+    specifiedType shouldBe defined
+  }
+
+  it should "correctly catch the unit-function special syntax" in {
+    val defn = "def foo() {}".parse[Stat].get.asInstanceOf[Defn.Def]
+    val inferredType = defn.decltpe
+    val specifiedType = explicitlySpecifiedReturnType(defn)
+
+    inferredType shouldBe defined
+    specifiedType should not be defined
   }
 }
 
