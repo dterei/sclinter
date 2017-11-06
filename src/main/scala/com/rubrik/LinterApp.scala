@@ -8,6 +8,7 @@ import com.rubrik.linter.LintResult
 import com.rubrik.linter.LintResult.Severity
 import com.rubrik.linter.Linter
 import com.rubrik.linter.MultilineAssignmentLinter
+import com.rubrik.linter.SingleSpaceAfterIfLinter
 import java.nio.file.Paths
 import play.api.libs.json.Json
 import scala.meta.Source
@@ -31,7 +32,8 @@ object LinterApp {
       ExceptionCatchArticleLinter,
       FunctionCallArgsLinter,
       FunctionDeclarationLinter,
-      MultilineAssignmentLinter)
+      MultilineAssignmentLinter,
+      SingleSpaceAfterIfLinter)
 
   def main(args: Array[String]): Unit = {
     val path = Paths.get(args(0))
