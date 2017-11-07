@@ -88,6 +88,14 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  )
       """
     }
+    assertLintError {
+      """
+        |throw RequestFailedException(
+        |  message = "oh poor request! what a failure!",
+        |  fatal = true
+        |)
+      """
+    }
   }
 
   it should "show lint errors for invalid code" in {
@@ -173,6 +181,15 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |                ^
         |                 arg1,
         |                 arg2)
+      """
+    }
+    assertLintError {
+      """
+        |throw RequestFailedException(
+        |      ^
+        |        message = "oh poor request! what a failure!",
+        |        fatal = true
+        |      )
       """
     }
   }

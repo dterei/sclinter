@@ -16,31 +16,44 @@ import scala.meta.quasiquotes.XtensionQuasiquoteTerm
   * is raised for wrong indentation levels.
   */
 object FunctionCallArgsLinter extends Linter {
-  type IndentRef = Tree
-  type Method = Tree
-  type IndentAmt = Int
-  type IndentSpec = (IndentRef, Method, IndentAmt)
+  case class IndentSpec(
+    ref: Tree,   // args should be indented wrt to this
+    amount: Int, // args should be indented by these many spaces
+    method: Tree // The actual method
+  )
 
-  private def indentSpec(func: Term): IndentSpec = {
+  private def indentSpec(funCall: Term.Apply): IndentSpec = {
     def spec(obj: Tree, method: Tree): IndentSpec = {
       // Q. Should the args be indented wrt obj, or wrt method?
       // Ans. If they are all on the same line, then obj, else method
       if (sameLine(obj, method)) {
-        (obj, method, 2)
+        IndentSpec(ref = obj, method = method, amount = 2)
       } else {
-        (method, method, 1)
+        // Indentation amount is just one space because of
+        // the period preceding the method name.
+        IndentSpec(ref = method, method = method, amount = 1)
       }
     }
 
+    val func = funCall.fun
     func match {
+      case _ if funCall.parent.exists(_.isInstanceOf[Term.Throw]) =>
+        IndentSpec(
+          ref = funCall.parent.get.asInstanceOf[Term.Throw],
+          method = func,
+          amount = 2)
       case q"$obj.$method" => spec(obj, method)
       case q"$obj.$method[..$t]" => spec(obj, method)
-      case q"$standAloneFunc" => (standAloneFunc, standAloneFunc, 2)
+      case q"$standAloneFunc" =>
+        IndentSpec(
+          ref = standAloneFunc,
+          method = standAloneFunc,
+          amount = 2)
     }
   }
 
   private def lintResult(funCall: Term.Apply): Option[LintResult] = {
-    val (indentRef, method, indentAmount) = indentSpec(funCall.fun)
+    val IndentSpec(indentRef, indentAmount, method) = indentSpec(funCall)
 
     val args = funCall.args
 
@@ -63,7 +76,8 @@ object FunctionCallArgsLinter extends Linter {
         val properlyIndented = argIndent == idealArgIndent
         if (!properlyIndented) {
           Some(
-            s"As `$indentRef` is indented by ${indent(indentRef)} spaces, " +
+            s"As `${indentRef.syntax.lines.toList.head}` is indented by " +
+              s"${indent(indentRef)} spaces, " +
               s"`${argName(args.head)}` must be indented by $idealArgIndent " +
               s"spaces, but is actually indented by $argIndent spaces.")
         } else {
