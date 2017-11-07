@@ -1,6 +1,7 @@
 package com.rubrik.linter.util
 
 import com.rubrik.linter.CodeSpec
+import com.rubrik.linter.util
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 import scala.meta.Defn
@@ -8,7 +9,8 @@ import scala.meta.Member
 import scala.meta.Stat
 import scala.meta.Term
 import scala.meta.Term.ApplyType
-import scala.meta.Type
+import scala.meta.Token.Comment
+import scala.meta.Tree
 import scala.meta.XtensionParseInputLike
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 import scala.meta.tokens.Token
@@ -290,6 +292,35 @@ class UtilSpec extends FlatSpec with Matchers {
 
     inferredType shouldBe defined
     specifiedType should not be defined
+  }
+
+
+  behavior of "commentJustAfter"
+
+  it should "correctly return comment after a subtree" in {
+    val funCall =
+      """
+        |makeCake(
+        |  batter,
+        |  chocolate /* mmm */,
+        |  eggs, /* sorry, vegans! */
+        |  love
+        |)
+      """
+        .stripMargin
+        .parse[Stat]
+        .get
+
+    def commentJustAfter(arg: Tree): Option[Comment] = {
+      util.commentJustAfter(tree = funCall, subTree = arg)
+    }
+
+    val q"$makeCake($batter, $chocolate, $eggs, $love)" = funCall
+
+    commentJustAfter(batter) should not be defined
+    commentJustAfter(chocolate) shouldBe defined
+    commentJustAfter(eggs) should not be defined // there's a comma in between
+    commentJustAfter(love) should not be defined
   }
 }
 

@@ -6,6 +6,7 @@ import scala.meta.Tree
 import scala.meta.Type
 import scala.meta.tokens.Token
 import scala.meta.tokens.Token.Colon
+import scala.meta.tokens.Token.Comment
 import scala.meta.tokens.Token.LeftBracket
 import scala.meta.tokens.Token.LeftParen
 import scala.meta.tokens.Token.RightBracket
@@ -31,8 +32,30 @@ package object util {
     trees.toSet[Tree].map(_.pos.startColumn).size <= 1
   }
 
+  def isEmpty(token: Token): Boolean = {
+    token.text.replaceAll("\\s", "").isEmpty
+  }
+
   def firstNonEmptyToken(tree: Tree): Token = {
-    tree.tokens.dropWhile(_.text.replaceAll("\\s", "").isEmpty).head
+    tree.tokens.dropWhile(isEmpty).head
+  }
+
+  /**
+    * @param tree the parent tree
+    * @param subTree the subtree, right after which we want to
+    *                search for a comment
+    * @return [[None]] if a comment doesn't follow in the {{tree}}
+    *         right after the {{subtree}}. Else, the comment wrapped
+    *         in a [[Some]].
+    */
+  def commentJustAfter(tree: Tree, subTree: Tree): Option[Comment] = {
+    val subTreeTokens = tokens(subTree)
+    tokens(tree)
+      .dropWhile(_ != subTreeTokens.head)
+      .dropWhile(subTreeTokens.contains)
+      .dropWhile(isEmpty)
+      .headOption
+      .collect { case comment: Comment => comment }
   }
 
   def indent(tree: Tree): Int = tree.pos.startColumn

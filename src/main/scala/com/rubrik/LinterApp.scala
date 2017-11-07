@@ -7,6 +7,7 @@ import com.rubrik.linter.FunctionDeclarationLinter
 import com.rubrik.linter.LintResult
 import com.rubrik.linter.LintResult.Severity
 import com.rubrik.linter.Linter
+import com.rubrik.linter.LiteralBooleanArgLinter
 import com.rubrik.linter.MultilineAssignmentLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
 import java.nio.file.Paths
@@ -32,6 +33,7 @@ object LinterApp {
       ExceptionCatchArticleLinter,
       FunctionCallArgsLinter,
       FunctionDeclarationLinter,
+      LiteralBooleanArgLinter,
       MultilineAssignmentLinter,
       SingleSpaceAfterIfLinter)
 
