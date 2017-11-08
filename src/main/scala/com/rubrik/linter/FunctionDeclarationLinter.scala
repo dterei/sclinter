@@ -10,22 +10,22 @@ import scala.meta.Tree
 import scala.meta.Type
 
 /**
-  * A [[Linter]] for function declarations.
-  * [[FunctionDeclarationLinter]] ensures that either the entire function
-  * signature fits in one line, or else the params and return type are
-  * formatted exactly as following:
-  * <code>
-  *   def foo(
-  *     arg1: T1,
-  *     arg2: T2
-  *   ): R
-  * </code>
-  *
-  * This linter also ensures that return types are always specified.
-  *
-  * TODO(sujeet): Eventually start catching function parameter indentation.
-  * Right now, that's not a high priority because people hardly get it wrong.
-  */
+ * A [[Linter]] for function declarations.
+ * [[FunctionDeclarationLinter]] ensures that either the entire function
+ * signature fits in one line, or else the params and return type are
+ * formatted exactly as following:
+ * <code>
+ *   def foo(
+ *     arg1: T1,
+ *     arg2: T2
+ *   ): R
+ * </code>
+ *
+ * This linter also ensures that return types are always specified.
+ *
+ * TODO(sujeet): Eventually start catching function parameter indentation.
+ * Right now, that's not a high priority because people hardly get it wrong.
+ */
 object FunctionDeclarationLinter extends Linter {
   private[linter] val ReverseFrownCode = "FUNDEF-REVERSE-FROWN"
   private[linter] val ClosingParenIndentCode = "FUNDEF-CLOSING-PAREN-INDENT"

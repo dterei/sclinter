@@ -7,11 +7,11 @@ import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 
 /**
-  * A [[Linter]] for assignment that span multiple lines.
-  * [[MultilineAssignmentLinter]] makes sure that when a
-  * multiline expression is assigned to a variable, the multiline
-  * expression starts on a new line of it's own.
-  */
+ * A [[Linter]] for assignment that span multiple lines.
+ * [[MultilineAssignmentLinter]] makes sure that when a
+ * multiline expression is assigned to a variable, the multiline
+ * expression starts on a new line of it's own.
+ */
 object MultilineAssignmentLinter extends Linter {
 
   private def invalid(variable: Tree, expr: Tree): Boolean = {

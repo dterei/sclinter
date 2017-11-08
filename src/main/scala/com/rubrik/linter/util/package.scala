@@ -61,14 +61,14 @@ package object util {
   def indent(tree: Tree): Int = tree.pos.startColumn
 
   /**
-    * The [[Tree.tokens]] builtin method returns [[Tokens]],
-    * which is a bit cumbersome to deal with, as it actually
-    * has reference to all the [[Token]]s, even those outside
-    * the tree. This method gives only the [[Token]]s belonging
-    * to the tree.
-    *
-    * @return all the tokens in {{tree}}
-    */
+   * The [[Tree.tokens]] builtin method returns [[Tokens]],
+   * which is a bit cumbersome to deal with, as it actually
+   * has reference to all the [[Token]]s, even those outside
+   * the tree. This method gives only the [[Token]]s belonging
+   * to the tree.
+   *
+   * @return all the tokens in {{tree}}
+   */
   private def tokens(tree: Tree): IndexedSeq[Token] = {
     val tokensObj: Tokens = tree.tokens
     tokensObj.map(identity)
@@ -136,24 +136,24 @@ package object util {
   }
 
   /**
-    * An alternative to the [[Defn.Def.decltpe]] method, because
-    * the [[scala.meta]] parser builds the exactly the same AST
-    * for the following two definitions:
-    *
-    * <code>
-    *   def foo(): Unit = {}
-    *   def foo() {}
-    * </code>
-    *
-    * However, we want to get [[None]] as explicitly declared type in the
-    * latter case, while not in the first case. This helper function does
-    * exactly that.
-    *
-    * @param defn The function definition whose explicitly specified
-    *             return type we want.
-    * @return [[None]] if no return type was specified in the source code,
-    *        otherwise an [[Option]] of the specified return type.
-    */
+   * An alternative to the [[Defn.Def.decltpe]] method, because
+   * the [[scala.meta]] parser builds the exactly the same AST
+   * for the following two definitions:
+   *
+   * <code>
+   *   def foo(): Unit = {}
+   *   def foo() {}
+   * </code>
+   *
+   * However, we want to get [[None]] as explicitly declared type in the
+   * latter case, while not in the first case. This helper function does
+   * exactly that.
+   *
+   * @param defn The function definition whose explicitly specified
+   *             return type we want.
+   * @return [[None]] if no return type was specified in the source code,
+   *        otherwise an [[Option]] of the specified return type.
+   */
   def explicitlySpecifiedReturnType(defn: Defn.Def): Option[Type] = {
     // We take advantage of the fact that if the return type
     // wasn't specified in the source code,

@@ -9,22 +9,22 @@ import play.api.libs.json.Json
 import scala.collection.immutable.IndexedSeq
 
 /**
-  * @param message Text describing the lint message. For example,
-  *                "This is a syntax error.".
-  * @param name Text summarizing the lint message. For example, "Syntax Error".
-  * @param severity [[Severity]] of the lint message.
-  * @param line The line number of the message (starts with 1, not 0).
-  * @param char The character offset of the message (starts with 1).
-  * @param original The text the message affects.
-  * @param replacement The text that should replace [[original]] to resolve
-  *                    the message.
-  * @param code A short error type identifier which can be used elsewhere to
-  *             configure handling of specific types of messages. For example,
-  *             "EXAMPLE1", "EXAMPLE2", etc., where each code identifies a
-  *             class of message like "syntax error", "missing whitespace",
-  *             etc. This allows configuration to later change the severity of
-  *             all whitespace messages, for example.
-  */
+ * @param message Text describing the lint message. For example,
+ *                "This is a syntax error.".
+ * @param name Text summarizing the lint message. For example, "Syntax Error".
+ * @param severity [[Severity]] of the lint message.
+ * @param line The line number of the message (starts with 1, not 0).
+ * @param char The character offset of the message (starts with 1).
+ * @param original The text the message affects.
+ * @param replacement The text that should replace [[original]] to resolve
+ *                    the message.
+ * @param code A short error type identifier which can be used elsewhere to
+ *             configure handling of specific types of messages. For example,
+ *             "EXAMPLE1", "EXAMPLE2", etc., where each code identifies a
+ *             class of message like "syntax error", "missing whitespace",
+ *             etc. This allows configuration to later change the severity of
+ *             all whitespace messages, for example.
+ */
 case class LintResult(
   message: String,
   name: Option[String] = None,

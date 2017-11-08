@@ -9,12 +9,12 @@ import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 
 /**
-  * A [[Linter]] for function call arguments.
-  * [[FunctionCallArgsLinter]] ensures that either all the arguments
-  * to a function call are on the same line, or they are left-aligned
-  * when multiline. In addition, for multiline arguments, a lint error
-  * is raised for wrong indentation levels.
-  */
+ * A [[Linter]] for function call arguments.
+ * [[FunctionCallArgsLinter]] ensures that either all the arguments
+ * to a function call are on the same line, or they are left-aligned
+ * when multiline. In addition, for multiline arguments, a lint error
+ * is raised for wrong indentation levels.
+ */
 object FunctionCallArgsLinter extends Linter {
   case class IndentSpec(
     ref: Tree,   // args should be indented wrt to this

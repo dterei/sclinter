@@ -4,9 +4,9 @@ import scala.meta.Term.If
 import scala.meta.Tree
 
 /**
-  * A [[Linter]] that ensures that there is exactly one space
-  * between `if` and the opening parenthesis.
-  */
+ * A [[Linter]] that ensures that there is exactly one space
+ * between `if` and the opening parenthesis.
+ */
 object SingleSpaceAfterIfLinter extends Linter {
 
   private def replacementText(stmt: If): String = {

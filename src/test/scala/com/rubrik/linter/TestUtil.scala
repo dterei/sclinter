@@ -6,9 +6,9 @@ import scala.meta.Stat
 import scala.meta.XtensionParseInputLike
 
 /**
-  * @param line 1 based index
-  * @param col 1 based index
-  */
+ * @param line 1 based index
+ * @param col 1 based index
+ */
 case class Caret(line: Int, col: Int)
 
 case class CodeSpec private(code: Stat, carets: Seq[Caret])

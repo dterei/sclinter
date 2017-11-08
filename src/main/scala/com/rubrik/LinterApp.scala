@@ -1,6 +1,7 @@
 package com.rubrik
 
 import com.rubrik.linter.ChainedMethodsLinter
+import com.rubrik.linter.DocCommentLinter
 import com.rubrik.linter.ExceptionCatchArticleLinter
 import com.rubrik.linter.FunctionCallArgsLinter
 import com.rubrik.linter.FunctionDeclarationLinter
@@ -16,20 +17,21 @@ import scala.meta.Source
 import scala.meta.XtensionParseInputLike
 
 /**
-  * Invoked with a single argument.
-  * Namely, the scala file to be linted.
-  * Prints JSON to standard out that's in the format expected by
-  * the arcanist-external-json-linter at
-  * https://github.com/ghc/arcanist-external-json-linter.
-  *
-  * The scala version of the format can found in [[LintResult]].
-  */
+ * Invoked with a single argument.
+ * Namely, the scala file to be linted.
+ * Prints JSON to standard out that's in the format expected by
+ * the arcanist-external-json-linter at
+ * https://github.com/ghc/arcanist-external-json-linter.
+ *
+ * The scala version of the format can found in [[LintResult]].
+ */
 object LinterApp {
   import LintResult.jsonFormat
 
   val linters: List[Linter] =
     List(
       ChainedMethodsLinter,
+      DocCommentLinter,
       ExceptionCatchArticleLinter,
       FunctionCallArgsLinter,
       FunctionDeclarationLinter,

@@ -6,17 +6,17 @@ import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 
 /**
-  * A [[Linter]] for exception catching statements like below in tests:
-  * <code>
-  *   an [Exception] shouldBe thrownBy ...
-  *   a [RuntimeError] shouldBe thrownBy ...
-  *   the [Exception] thrownBy ...
-  * </code>
-  * [[ExceptionCatchArticleLinter]] ensures that the correct article
-  * between a/an is being used. In addition, it is also ensured that
-  * there's exactly one space between the article and the opening
-  * square bracket.
-  */
+ * A [[Linter]] for exception catching statements like below in tests:
+ * <code>
+ *   an [Exception] shouldBe thrownBy ...
+ *   a [RuntimeError] shouldBe thrownBy ...
+ *   the [Exception] thrownBy ...
+ * </code>
+ * [[ExceptionCatchArticleLinter]] ensures that the correct article
+ * between a/an is being used. In addition, it is also ensured that
+ * there's exactly one space between the article and the opening
+ * square bracket.
+ */
 object ExceptionCatchArticleLinter extends Linter {
 
   override def lint(tree: Tree): Seq[LintResult] = {

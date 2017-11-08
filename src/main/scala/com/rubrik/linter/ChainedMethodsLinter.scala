@@ -8,12 +8,12 @@ import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 
 /**
-  * A [[Linter]] for chained method/attribute expressions.
-  * [[ChainedMethodsLinter]] ensures that either all the method
-  * and attribute accesses lie on the same line, or each one gets
-  * their own line and the dots are aligned vertically, and
-  * the entire chain is correctly indented.
-  */
+ * A [[Linter]] for chained method/attribute expressions.
+ * [[ChainedMethodsLinter]] ensures that either all the method
+ * and attribute accesses lie on the same line, or each one gets
+ * their own line and the dots are aligned vertically, and
+ * the entire chain is correctly indented.
+ */
 object ChainedMethodsLinter extends Linter {
 
   private def invalid(obj: Tree, method1: Tree, method2: Tree): Boolean = {
