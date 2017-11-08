@@ -5,27 +5,27 @@ import scala.meta.Term
 import scala.meta.Tree
 
 /**
-  * A [[Linter]] that ensures that there are no literal
-  * `true` or `false` arguments passed to any functions.
-  *
-  * The recommended syntax is:
-  *
-  * Note that we chose the java call syntax that way, so that we can
-  * still easily enforce vertical left-alignment of arguments.
-  * (with [[FunctionCallArgsLinter]])
-  *
-  * <code>
-  *   scalaFunc(
-  *     nonBooleanLiteralArg,
-  *     argName = true
-  *   )
-  *
-  *   javaFunc(
-  *     nonBooleanLiteralArg,
-  *     true /* argName */
-  *   )
-  * </code>
-  */
+ * A [[Linter]] that ensures that there are no literal
+ * `true` or `false` arguments passed to any functions.
+ *
+ * The recommended syntax is:
+ *
+ * Note that we chose the java call syntax that way, so that we can
+ * still easily enforce vertical left-alignment of arguments.
+ * (with [[FunctionCallArgsLinter]])
+ *
+ * <code>
+ *   scalaFunc(
+ *     nonBooleanLiteralArg,
+ *     argName = true
+ *   )
+ *
+ *   javaFunc(
+ *     nonBooleanLiteralArg,
+ *     true /* argName */
+ *   )
+ * </code>
+ */
 object LiteralBooleanArgLinter extends Linter {
 
   private def lintResult(funCall: Term.Apply): Seq[LintResult] = {

@@ -41,13 +41,13 @@ package object util {
   }
 
   /**
-    * @param tree the parent tree
-    * @param subTree the subtree, right after which we want to
-    *                search for a comment
-    * @return [[None]] if a comment doesn't follow in the {{tree}}
-    *         right after the {{subtree}}. Else, the comment wrapped
-    *         in a [[Some]].
-    */
+   * @param tree the parent tree
+   * @param subTree the subtree, right after which we want to
+   *                search for a comment
+   * @return [[None]] if a comment doesn't follow in the {{tree}}
+   *         right after the {{subtree}}. Else, the comment wrapped
+   *         in a [[Some]].
+   */
   def commentJustAfter(tree: Tree, subTree: Tree): Option[Comment] = {
     val subTreeTokens = tokens(subTree)
     tokens(tree)
