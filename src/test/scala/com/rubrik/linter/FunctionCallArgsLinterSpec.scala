@@ -90,6 +90,29 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
     }
     assertLintError {
       """
+        |this
+        |  .that[String]
+        |  .func[Int](
+        |    arg1,
+        |    arg2
+        |  )(
+        |    otherArg1,
+        |    otherArg2
+        |  )
+      """
+    }
+    assertLintError {
+      """
+        |this
+        |  .that[String]
+        |  .func[Int](arg) {
+        |    doAwesomeStuff()
+        |    andMoreStuff()
+        |  }
+      """
+    }
+    assertLintError {
+      """
         |throw RequestFailedException(
         |  message = "oh poor request! what a failure!",
         |  fatal = true

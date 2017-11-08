@@ -44,6 +44,8 @@ object FunctionCallArgsLinter extends Linter {
           amount = 2)
       case q"$obj.$method" => spec(obj, method)
       case q"$obj.$method[..$t]" => spec(obj, method)
+      case q"$obj.$method(..$args)" => spec(obj, method)
+      case q"$obj.$method[..$t](..$args)" => spec(obj, method)
       case q"$standAloneFunc" =>
         IndentSpec(
           ref = standAloneFunc,
