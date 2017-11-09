@@ -70,6 +70,13 @@ object TestUtil extends Matchers {
       lintResults.map(_.code) shouldBe codes.map(Some(_))
       this
     }
+
+    final def withMessages(
+      messages: String*
+    ): LintResultInspector = {
+      lintResults.map(_.message) shouldBe messages
+      this
+    }
   }
 
   def assertLintError(linter: Linter)(code: String): LintResultInspector = {

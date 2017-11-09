@@ -322,6 +322,63 @@ class UtilSpec extends FlatSpec with Matchers {
     commentJustAfter(eggs) should not be defined // there's a comma in between
     commentJustAfter(love) should not be defined
   }
+
+
+  behavior of "isCompleteCallChain"
+
+  it should "correctly identify non call-chains" in {
+    def isCompleteCallChain(code: String): Boolean = {
+      util.isCompleteCallChain(code.parse[Stat].get)
+    }
+    isCompleteCallChain("class Hierarchy {}") shouldBe false
+    isCompleteCallChain("object IficationShouldStop {}") shouldBe false
+    isCompleteCallChain("val answer = 42") shouldBe false
+    isCompleteCallChain("def doNothing() {}") shouldBe false
+  }
+
+  val chain =
+    """
+      |obj
+      |  .property
+      |  .method()
+      |  .templatedProperty[Int]
+      |  .templatedMethod[String, Int](arg)
+      |  .curriedMethod(arg1)(arg2)(arg3.innerProp.innerCall())
+      |  .lastProperty
+    """
+      .stripMargin
+      .parse[Stat]
+      .get
+
+  it should "differentiate between partial and complete call-chains" in {
+    def isComplete(chain: Tree): Boolean = util.isCompleteCallChain(chain)
+
+    // There are only two complete call chains:
+    // obj.property.method.. ..lastProperty
+    // arg3...innerCall()
+    chain collect {
+      case subChain if isComplete(subChain) => subChain
+    } should have size 2
+  }
+
+
+  behavior of "getCallChainComponents"
+
+  it should "correctly return the components of a call-chain" in {
+    val MethodLike = false
+    val PropertyLike = true
+    util
+      .getCallChainComponents(chain)
+      .map(link => (link.name.syntax, link.isAttrLike))
+      .shouldBe(
+        List(
+          "property"          -> PropertyLike,
+          "method"            -> MethodLike,
+          "templatedProperty" -> PropertyLike,
+          "templatedMethod"   -> MethodLike,
+          "curriedMethod"     -> MethodLike,
+          "lastProperty"      -> PropertyLike))
+  }
 }
 
 object UtilSpec extends Matchers {

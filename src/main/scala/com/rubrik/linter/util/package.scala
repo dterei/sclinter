@@ -1,9 +1,15 @@
 package com.rubrik.linter
 
+import scala.annotation.tailrec
 import scala.meta.Defn
+import scala.meta.Term
+import scala.meta.Term.Apply
 import scala.meta.Term.ApplyType
+import scala.meta.Term.Name
+import scala.meta.Term.Select
 import scala.meta.Tree
 import scala.meta.Type
+import scala.meta.XtensionQuasiquoteTerm
 import scala.meta.tokens.Token
 import scala.meta.tokens.Token.Colon
 import scala.meta.tokens.Token.Comment
@@ -160,4 +166,54 @@ package object util {
     // it wouldn't have any tokens associated with it.
     defn.decltpe.filterNot(_.tokens.isEmpty)
   }
+
+  def isCompleteCallChain(tree: Tree): Boolean = {
+    def chainContinuesFurther(partialChain: Tree): Boolean = {
+      partialChain.parent exists {
+        case Apply(func, _) => func == partialChain
+        case Select(obj, _) => obj == partialChain
+        case ApplyType(func, _) => func == partialChain
+        case _ => false
+      }
+    }
+
+    tree match {
+      case _: Apply | _: ApplyType | _: Select => !chainContinuesFurther(tree)
+      case _ => false
+    }
+  }
+
+  /**
+   * @return List(foo, bar, blah,meh) for a tree like
+   *         "obj.foo.bar().blah[Int].meh" and an empty list
+   *         for a {{tree}} that's not a complete call-chain.
+   */
+  def getCallChainComponents(tree: Tree): List[CallChainLink] = {
+
+    @tailrec def helper(
+      prefixTree: Tree,
+      suffixComponents: List[CallChainLink]
+    ): List[CallChainLink] = {
+      val (newPrefixTree, newLink, isAttrLike) =
+        prefixTree match {
+          case q"$obj.$attr"                        => (obj, attr, true)
+          case q"$obj.$attr[..$targs]"              => (obj, attr, true)
+          case q"$obj.$method(...$argss)"           => (obj, method, false)
+          case q"$obj.$method[..$targs](...$argss)" => (obj, method, false)
+          case _                                    => return suffixComponents
+        }
+      helper(
+        newPrefixTree,
+        CallChainLink(newLink, isAttrLike) :: suffixComponents)
+    }
+
+    helper(tree, List.empty)
+  }
 }
+
+/**
+ * Class to model components of a call-chain.
+ * @param name name of the function/attribute
+ * @param isAttrLike true if looks like member access and not like method call
+ */
+case class CallChainLink(name: Name, isAttrLike: Boolean)
