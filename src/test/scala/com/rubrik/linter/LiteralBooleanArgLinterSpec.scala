@@ -15,8 +15,9 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
 
   it should "not show lint errors for valid code" in {
     assertLintError { "add(1, 2)" }
-    assertLintError { "deleteAll(really = true)" }
-    assertLintError { "deleteAll(true /* really */)" }
+    assertLintError { "deleteAll(folder, really = true)" }
+    assertLintError { "deleteAll(folder, true /* really */)" }
+    assertLintError { "booleanOpt.getOrElse(true)"}
 
     assertLintError {
       """
@@ -42,8 +43,8 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
   it should "show lint errors for invalid code" in {
     assertLintError {
       """
-        |deleteAll(true)
-        |          ^
+        |deleteAll(folder, true)
+        |                  ^
       """
     }
 

@@ -25,10 +25,16 @@ import scala.meta.Tree
  *     true /* argName */
  *   )
  * </code>
+ *
+ * Also note that we treat single argument functions as an exception,
+ * as more often than not, they are simply instances of `Some(true)`,
+ * `foo shouldBe false` and so on.
  */
 object LiteralBooleanArgLinter extends Linter {
 
   private def lintResult(funCall: Term.Apply): Seq[LintResult] = {
+    if (funCall.args.length == 1) return Seq.empty
+
     def uncommented(literal: Lit.Boolean): Boolean = {
       util.commentJustAfter(tree = funCall, subTree = literal).isEmpty
     }
