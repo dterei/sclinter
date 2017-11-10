@@ -22,6 +22,15 @@ object FunctionCallArgsLinter extends Linter {
     method: Tree // The actual method
   )
 
+  private def shouldTakeUnaryPrefixIntoAccount(
+    funCall: Term.Apply
+  ): Boolean =  {
+    funCall
+      .parent
+      .collect { case unaryPrefix: Term.ApplyUnary => unaryPrefix.op }
+      .exists(_.pos.startLine == funCall.fun.pos.endLine)
+  }
+
   private def indentSpec(funCall: Term.Apply): IndentSpec = {
     def spec(obj: Tree, method: Tree): IndentSpec = {
       // Q. Should the args be indented wrt obj, or wrt method?
@@ -42,15 +51,17 @@ object FunctionCallArgsLinter extends Linter {
           ref = funCall.parent.get.asInstanceOf[Term.Throw],
           method = func,
           amount = 2)
-      case q"$obj.$method" => spec(obj, method)
-      case q"$obj.$method[..$t]" => spec(obj, method)
-      case q"$obj.$method(..$args)" => spec(obj, method)
+      case _ if shouldTakeUnaryPrefixIntoAccount(funCall) =>
+        IndentSpec(
+          ref = funCall.parent.get.asInstanceOf[Term.ApplyUnary],
+          method = func,
+          amount = 2)
+      case q"$obj.$method"                => spec(obj, method)
+      case q"$obj.$method[..$t]"          => spec(obj, method)
+      case q"$obj.$method(..$args)"       => spec(obj, method)
       case q"$obj.$method[..$t](..$args)" => spec(obj, method)
       case q"$standAloneFunc" =>
-        IndentSpec(
-          ref = standAloneFunc,
-          method = standAloneFunc,
-          amount = 2)
+        IndentSpec(ref = standAloneFunc, method = standAloneFunc, amount = 2)
     }
   }
 

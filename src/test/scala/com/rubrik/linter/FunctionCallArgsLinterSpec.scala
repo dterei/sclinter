@@ -48,6 +48,23 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
     }
     assertLintError {
       """
+        |!foo(
+        |  arg1,
+        |  arg2,
+        |  arg3)
+      """
+    }
+    assertLintError {
+      """
+        |val nagativeSum =
+        |  - sum(
+        |    arg1,
+        |    arg2
+        |  )
+      """
+    }
+    assertLintError {
+      """
         |this.that.which.foo(
         |  arg1,
         |  arg2,
@@ -67,6 +84,24 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |this
         |  .that
         |  .func(arg1, arg2, arg3)
+      """
+    }
+    assertLintError {
+      """
+        |!this
+        |  .that
+        |  .func(
+        |    arg1,
+        |    arg2,
+        |    arg3)
+      """
+    }
+    assertLintError {
+      """
+        |val negativeSum =
+        |  - myList
+        |    .map(_.value)
+        |    .reduce(_ + _)
       """
     }
     assertLintError {
