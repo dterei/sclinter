@@ -1,4 +1,7 @@
 # sclinter
+[![Build Status](https://img.shields.io/travis/scaledata/sclinter.svg)](https://travis-ci.org/scaledata/sclinter)
+[![Test Coverage](https://img.shields.io/codecov/c/github/scaledata/sclinter.svg)](https://codecov.io/gh/scaledata/sclinter)
+
 `sclinter` is a [`scala.meta`](http://scalameta.org/) based linter which aims to 
 eventually encode [Rubrik's scala formatting guide](https://goo.gl/AjwKBy)
 completely.
