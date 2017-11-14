@@ -31,6 +31,39 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
+    assertLintError {
+      """
+        |def curried(
+        |  x: Int,
+        |  y: Int
+        |)(
+        |  z: Int,
+        |  m: Int
+        |): Int = {
+        |  x * y - z * m
+        |}
+      """
+    }
+    assertLintError {
+      """
+        |def curried(
+        |  x: Int,
+        |  y: Int
+        |)(z: Int, m: Int): Int = {
+        |  x * y - z * m
+        |}
+      """
+    }
+    assertLintError {
+      """
+        |def curried(
+        |  x: Int,
+        |  y: Int
+        |)(): Int = {
+        |  x * y
+        |}
+      """
+    }
     assertLintError { "def answer: Int = 42" }
     assertLintError { "def answer[T]: Int = 42" }
     assertLintError { "def getAnswer(): Int = 42" }

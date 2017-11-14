@@ -37,7 +37,12 @@ object CodeSpec {
         // The index from zipWithIndex works fine as line number
         // because the indices start from 0 while line numbers start from 1
         // On the other hand, we need to offset the column number by 1
-        .map { case (line, lineNo) => Caret(lineNo, line.indexOf("^") + 1) }
+        .flatMap {
+          case (line, lineNo) =>
+            val columnNumbers: Seq[Int] =
+              (0 until line.length).filter(line.startsWith("^", _)).map(_ + 1)
+            columnNumbers.map(Caret(lineNo, _))
+        }
 
     new CodeSpec(code, carets)
   }

@@ -14,6 +14,8 @@ import scala.meta.Tree
 import scala.meta.XtensionParseInputLike
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
 import scala.meta.tokens.Token
+import scala.meta.tokens.Token.LeftParen
+import scala.meta.tokens.Token.RightParen
 import scala.reflect.ClassTag
 
 class UtilSpec extends FlatSpec with Matchers {
@@ -270,6 +272,56 @@ class UtilSpec extends FlatSpec with Matchers {
         |   ]
         |   ^
       """
+    }
+  }
+
+
+  behavior of "matchingParen"
+
+  it should "correctly find the matching opening parenthesis" in {
+    assertMatchingParen {
+      """
+        |def foo(i: (Int, Int), j: String)(): (String, (Int, Int)) = ???
+        |       ^                        ^
+      """
+    }
+    assertMatchingParen {
+      """
+        |def foo(i: (Int, Int), j: String)(): (String, (Int, Int)) = ???
+        |           ^        ^
+      """
+    }
+    assertMatchingParen {
+      """
+        |def foo(i: (Int, Int), j: String)(): (String, (Int, Int)) = ???
+        |                                 ^^
+      """
+    }
+    assertMatchingParen {
+      """
+        |def foo(i: (Int, Int), j: String)(): (String, (Int, Int)) = ???
+        |                                     ^                  ^
+      """
+    }
+    assertMatchingParen {
+      """
+        |def foo(i: (Int, Int), j: String)(): (String, (Int, Int)) = ???
+        |                                              ^        ^
+      """
+    }
+
+    def assertMatchingParen(rawSpec: String): Unit = {
+      val codeSpec = CodeSpec(rawSpec)
+      codeSpec.carets should have length 2
+      val Seq(lParen, rParen) =
+        codeSpec
+          .carets
+          .map(_.col - 1)
+          .map(col => codeSpec.code.tokens.find(_.pos.startColumn == col).get)
+
+      matchingParen(codeSpec.code, rParen.asInstanceOf[RightParen]) shouldBe {
+        lParen.asInstanceOf[LeftParen]
+      }
     }
   }
 

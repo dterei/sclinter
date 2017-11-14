@@ -2,6 +2,7 @@ package com.rubrik.linter
 
 import com.rubrik.linter.util.closingParen
 import com.rubrik.linter.util.firstNonEmptyToken
+import com.rubrik.linter.util.matchingParen
 import com.rubrik.linter.util.openingParen
 import com.rubrik.linter.util.returnTypeColon
 import com.rubrik.linter.util.sameLine
@@ -55,6 +56,10 @@ object FunctionDeclarationLinter extends Linter {
             }
             // Found the reverse frown, but is it indented correctly?
             else if (
+              rParen.pos.startLine == matchingParen(defn, rParen).pos.startLine
+            ) {
+              None
+            } else if (
               rParen.pos.startColumn !=
                 firstNonEmptyToken(defn).pos.startColumn
             ) {

@@ -119,6 +119,28 @@ package object util {
       .collectFirst { case paren: RightParen => paren }
   }
 
+  def matchingParen(tree: Tree, rParen: RightParen): LeftParen = {
+
+    @tailrec def iterate(
+      tokenList: List[Token],
+      numLeftParensToDiscard: Int
+    ): LeftParen = {
+      tokenList.head match {
+        case _: RightParen =>
+          iterate(tokenList.tail, numLeftParensToDiscard + 1)
+        case left: LeftParen =>
+          if (numLeftParensToDiscard == 0) left
+          else iterate(tokenList.tail, numLeftParensToDiscard - 1)
+        case _ =>
+          iterate(tokenList.tail, numLeftParensToDiscard)
+      }
+    }
+
+    iterate(
+      tokenList = tokens(tree).takeWhile(_ != rParen).reverse.toList,
+      numLeftParensToDiscard = 0)
+  }
+
   def returnTypeColon(defn: Defn.Def): Option[Colon] = {
     explicitlySpecifiedReturnType(defn)
       .map {
