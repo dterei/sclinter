@@ -15,7 +15,6 @@ final class ScalaLinterTestEngine extends ArcanistUnitTestEngine {
   }
 
   public function run() {
-    $console = PhutilConsole::getConsole();
     $project_root = $this->getWorkingCopy()->getProjectRoot();
     $reports_dir = 'target/test-reports';
     $coverage_file = 'target/scala-2.12/coverage-report/cobertura.xml';
@@ -54,9 +53,10 @@ final class ScalaLinterTestEngine extends ArcanistUnitTestEngine {
   }
 
   private function execCmd($cmd) {
+    $console = PhutilConsole::getConsole();
     $future = new ExecFuture('%C', $cmd);
     try {
-      list($stdout, $stderr) = $future->resolvex();
+      $future->resolvex();
     } catch (CommandException $e) {
       $console->writeErr($cmd.' failed: %s', $e->getStdout());
       exit(1);
