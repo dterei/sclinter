@@ -15,6 +15,7 @@ import java.nio.file.Paths
 import play.api.libs.json.Json
 import scala.meta.Source
 import scala.meta.XtensionParseInputLike
+import scala.meta.parsers.ParseException
 
 /**
  * Invoked with a single argument.
@@ -39,11 +40,9 @@ object LinterApp {
       MultilineAssignmentLinter,
       SingleSpaceAfterIfLinter)
 
-  def main(args: Array[String]): Unit = {
-    val path = Paths.get(args(0))
-    val sourceText = scala.io.Source.fromFile(path.toFile).mkString
-    val source = sourceText.parse[Source].get
-    val results: Seq[LintResult] =
+  def lintResults(sourceCode: String): Seq[LintResult] = {
+    try {
+      val source = sourceCode.parse[Source].get
       linters
         .flatMap(_.lint(source))
         // TODO(sujeet): once we're ready for errors to appear
@@ -60,6 +59,23 @@ object LinterApp {
                 }
             )
         }
+    } catch {
+      case e: ParseException =>
+        Seq(
+          LintResult(
+            message = e.shortMessage,
+            code = Some("SYNTAX-ERROR"),
+            name = Some("Scala syntax error"),
+            severity = Some(Severity.Error),
+            line = Some(e.pos.startLine + 1),
+            char = Some(e.pos.startColumn + 1)))
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val path = Paths.get(args(0))
+    val sourceText = scala.io.Source.fromFile(path.toFile).mkString
+    val results = lintResults(sourceText)
     println(Json.prettyPrint(Json.toJson(results)))
   }
 }
