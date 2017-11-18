@@ -14,7 +14,7 @@ object SingleSpaceAfterIfLinter extends Linter {
   }
 
   private def lintResult(stmt: If): Option[LintResult] = {
-    if (stmt.syntax.startsWith("if (")) {
+    if (stmt.syntax == replacementText(stmt)) {
       None
     } else {
       Some(

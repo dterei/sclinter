@@ -16,6 +16,7 @@ class SingleSpaceAfterIfLinterSpec extends FlatSpec with Matchers {
   it should "not show lint errors for valid code" in {
     assertLintError { "if (foo) bar" }
     assertLintError { "if (foo) bar else blah" }
+    assertLintError { "(if (true) 42 else whatever)" }
   }
 
   it should "show lint errors for invalid code" in {
