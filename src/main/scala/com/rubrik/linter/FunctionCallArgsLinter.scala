@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.util.firstNonEmptyToken
 import com.rubrik.linter.util.indent
 import com.rubrik.linter.util.leftAligned
 import com.rubrik.linter.util.sameLine
@@ -22,13 +23,17 @@ object FunctionCallArgsLinter extends Linter {
     method: Tree // The actual method
   )
 
-  private def shouldTakeUnaryPrefixIntoAccount(
+  private def shouldConsiderPreviousToken(
     funCall: Term.Apply
-  ): Boolean =  {
+  ): Boolean = {
     funCall
       .parent
-      .collect { case unaryPrefix: Term.ApplyUnary => unaryPrefix.op }
-      .exists(_.pos.startLine == funCall.fun.pos.endLine)
+      .collect {
+        case unaryPrefix: Term.ApplyUnary => unaryPrefix.op.pos.startLine
+        case stmt: Term.Throw => firstNonEmptyToken(stmt).pos.startLine
+        case stmt: Term.Return => firstNonEmptyToken(stmt).pos.startLine
+      }
+      .exists(_ == funCall.fun.pos.endLine)
   }
 
   private def indentSpec(funCall: Term.Apply): IndentSpec = {
@@ -46,16 +51,8 @@ object FunctionCallArgsLinter extends Linter {
 
     val func = funCall.fun
     func match {
-      case _ if funCall.parent.exists(_.isInstanceOf[Term.Throw]) =>
-        IndentSpec(
-          ref = funCall.parent.get.asInstanceOf[Term.Throw],
-          method = func,
-          amount = 2)
-      case _ if shouldTakeUnaryPrefixIntoAccount(funCall) =>
-        IndentSpec(
-          ref = funCall.parent.get.asInstanceOf[Term.ApplyUnary],
-          method = func,
-          amount = 2)
+      case _ if shouldConsiderPreviousToken(funCall) =>
+        IndentSpec(ref = funCall.parent.get, method = func, amount = 2)
       case q"$obj.$method"                => spec(obj, method)
       case q"$obj.$method[..$t]"          => spec(obj, method)
       case q"$obj.$method(..$args)"       => spec(obj, method)

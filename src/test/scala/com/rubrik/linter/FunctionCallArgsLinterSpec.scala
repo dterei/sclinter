@@ -154,6 +154,14 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
+    assertLintError {
+      """
+        |return makeMirchiBhajji(
+        |  chickPeaBatter,
+        |  chillies
+        |)
+      """
+    }
   }
 
   it should "show lint errors for invalid code" in {
