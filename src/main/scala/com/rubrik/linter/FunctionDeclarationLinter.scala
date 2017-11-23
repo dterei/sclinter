@@ -8,7 +8,6 @@ import com.rubrik.linter.util.returnTypeColon
 import com.rubrik.linter.util.sameLine
 import scala.meta.Defn
 import scala.meta.Tree
-import scala.meta.Type
 
 /**
  * A [[Linter]] for function declarations.

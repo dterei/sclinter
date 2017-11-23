@@ -1,6 +1,5 @@
 package com.rubrik.linter
 
-import scala.meta.Source
 import scala.meta.Token.Comment
 import scala.meta.Tree
 

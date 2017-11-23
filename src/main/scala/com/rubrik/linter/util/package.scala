@@ -2,7 +2,6 @@ package com.rubrik.linter
 
 import scala.annotation.tailrec
 import scala.meta.Defn
-import scala.meta.Term
 import scala.meta.Term.Apply
 import scala.meta.Term.ApplyType
 import scala.meta.Term.Name
