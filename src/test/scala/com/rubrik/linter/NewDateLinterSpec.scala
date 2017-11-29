@@ -16,8 +16,6 @@ class NewDateLinterSpec extends FlatSpec with Matchers {
   it should "not show lint errors for valid code" in {
     assertLintError { "new Date(arg)" }
     assertLintError { "new DateTime(arg)" }
-    assertLintError { "DateTime.now(arg)" }
-    assertLintError { "Instant.now(arg)" }
   }
 
   it should "show lint errors for invalid code" in {
@@ -58,6 +56,12 @@ class NewDateLinterSpec extends FlatSpec with Matchers {
     }
 
     assertLintError {
+      """|DateTime.now(arg)
+         |^
+      """
+    }
+
+    assertLintError {
       """|Instant.now
          |^
       """
@@ -65,6 +69,12 @@ class NewDateLinterSpec extends FlatSpec with Matchers {
 
     assertLintError {
       """|Instant.now()
+         |^
+      """
+    }
+
+    assertLintError {
+      """|Instant.now(arg)
          |^
       """
     }

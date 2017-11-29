@@ -23,21 +23,13 @@ import scala.meta.XtensionQuasiquoteTerm
  * injecting a clock object and raises warnings.
  */
 object NewDateLinter extends Linter {
-  private def lintResult(newCall: Tree): Option[LintResult] = {
-    Some(
-      LintResult(
-        code = Some("NO-NEW-DATE"),
-        severity = Some(Severity.Warning),
-        line = Some(newCall.pos.startLine + 1),
-        char = Some(newCall.pos.startColumn + 1),
-        message = "Inject a clock to use something like `clock.now` instead."))
-  }
-
-  private def hasArgs(attrAccess: Tree): Boolean = {
-    attrAccess.parent exists {
-      case q"$attrAccess($_)" => true
-      case _ => false
-    }
+  private def lintResult(newCall: Tree): LintResult = {
+    LintResult(
+      code = Some("NO-NEW-DATE"),
+      severity = Some(Severity.Warning),
+      line = Some(newCall.pos.startLine + 1),
+      char = Some(newCall.pos.startColumn + 1),
+      message = "Inject a clock to use something like `clock.now` instead.")
   }
 
   override def lint(tree: Tree): Seq[LintResult] = {
@@ -47,9 +39,8 @@ object NewDateLinter extends Linter {
           lintResult(newCall)
         case newCall @ q"new DateTime(...$argss)" if argss.flatten.isEmpty =>
           lintResult(newCall)
-        case now @ q"Instant.now" if !hasArgs(now) => lintResult(now)
-        case now @ q"DateTime.now" if !hasArgs(now) => lintResult(now)
+        case now @ q"Instant.now" => lintResult(now)
+        case now @ q"DateTime.now" => lintResult(now)
       }
-      .flatten
   }
 }
