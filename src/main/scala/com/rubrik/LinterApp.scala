@@ -11,6 +11,7 @@ import com.rubrik.linter.LintResult.Severity
 import com.rubrik.linter.Linter
 import com.rubrik.linter.LiteralBooleanArgLinter
 import com.rubrik.linter.MultilineAssignmentLinter
+import com.rubrik.linter.NewDateLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
 import java.nio.file.Paths
 import play.api.libs.json.Json
@@ -40,6 +41,7 @@ object LinterApp {
       FunctionDeclarationLinter,
       LiteralBooleanArgLinter,
       MultilineAssignmentLinter,
+      NewDateLinter,
       SingleSpaceAfterIfLinter)
 
   def lintResults(sourceCode: String): Seq[LintResult] = {
