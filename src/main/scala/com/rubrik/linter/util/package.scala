@@ -230,6 +230,15 @@ package object util {
 
     helper(tree, List.empty)
   }
+
+  def isWhiteSpace(token: Token): Boolean = token match {
+    case _: Token.LF |
+         _: Token.FF |
+         _: Token.CR |
+         _: Token.Tab |
+         _: Token.Space => true
+    case _ => false
+  }
 }
 
 /**
