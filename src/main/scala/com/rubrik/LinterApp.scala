@@ -18,6 +18,7 @@ import play.api.libs.json.Json
 import scala.meta.Source
 import scala.meta.XtensionParseInputLike
 import scala.meta.parsers.ParseException
+import scala.meta.tokens.Token.Comment
 
 /**
  * Invoked with a single argument.
@@ -44,11 +45,26 @@ object LinterApp {
       NewDateLinter,
       SingleSpaceAfterIfLinter)
 
+  val CommentOffPrefixes = Set("sclinter:off", "nolint", "noqa", "lint:off")
+
+  private def isLintIgnore(comment: Comment): Boolean = {
+    CommentOffPrefixes.exists(comment.value.trim.startsWith)
+  }
+
   def lintResults(sourceCode: String): Seq[LintResult] = {
     try {
       val source = sourceCode.parse[Source].get
+      val lineNosToIgnore: Set[Int] =
+        source
+          .tokens
+          .collect {
+            case c: Comment if isLintIgnore(c) => c.pos.startLine + 1
+          }
+          .toSet
+
       linters
         .flatMap(_.lint(source))
+        .filterNot(_.line.exists(lineNosToIgnore))
         // TODO(sujeet): once we're ready for errors to appear
         // in parts of file that aren't touched in a diff, stop
         // making everything into a warning.

@@ -48,6 +48,26 @@ Add the linter to `.arclint`:
 }
 ```
 
+## Configuration
+
+#### Disabling `sclinter` for a particular line
+Add one of `sclinter:off`, `nolint`, `noqa`, `lint:off` as a comment the
+line, where you want to ignore lint errors.
+
+###### Example:
+```scala
+// The type of the following function is a mouthful, and doesn't
+// help in documentation even if written out explicitly.
+def complexTypedFunction = { // nolint
+  implementation
+}
+
+// You can add short explanations after the comment too
+if(condition){ // lint:off I know I'm messing with whitespace, <explanation>.
+  awesomeStuff()
+}
+```
+
 ## Development
 Install `sbt` by following the
 [installation guide](http://www.scala-sbt.org/release/docs/Setup.html)
