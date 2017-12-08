@@ -51,8 +51,8 @@ Add the linter to `.arclint`:
 ## Configuration
 
 #### Disabling `sclinter` for a particular line
-Add one of `sclinter:off`, `nolint`, `noqa`, `lint:off` as a comment the
-line, where you want to ignore lint errors.
+Add one of `sclinter:off`, `nolint`, `noqa`, `lint:off` as
+a comment to the line, where you want to ignore lint errors.
 
 ###### Example:
 ```scala
