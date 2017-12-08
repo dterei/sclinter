@@ -7,6 +7,7 @@ import com.rubrik.linter.DocCommentLinter
 import com.rubrik.linter.ExceptionCatchArticleLinter
 import com.rubrik.linter.FunctionCallArgsLinter
 import com.rubrik.linter.FunctionDeclarationLinter
+import com.rubrik.linter.LeftBraceLinter
 import com.rubrik.linter.LintResult
 import com.rubrik.linter.LintResult.Severity
 import com.rubrik.linter.Linter
@@ -42,6 +43,7 @@ object LinterApp {
       ExceptionCatchArticleLinter,
       FunctionCallArgsLinter,
       FunctionDeclarationLinter,
+      LeftBraceLinter,
       LiteralBooleanArgLinter,
       MultilineAssignmentLinter,
       NewDateLinter,
