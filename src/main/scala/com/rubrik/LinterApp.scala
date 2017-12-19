@@ -15,6 +15,7 @@ import com.rubrik.linter.LiteralBooleanArgLinter
 import com.rubrik.linter.MultilineAssignmentLinter
 import com.rubrik.linter.NewDateLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
+import com.rubrik.linter.TrivialOptionLinter
 import java.nio.file.Paths
 import play.api.libs.json.Json
 import scala.meta.Source
@@ -47,7 +48,8 @@ object LinterApp {
       LiteralBooleanArgLinter,
       MultilineAssignmentLinter,
       NewDateLinter,
-      SingleSpaceAfterIfLinter)
+      SingleSpaceAfterIfLinter,
+      TrivialOptionLinter)
 
   val CommentOffPrefixes = Set("sclinter:off", "nolint", "noqa", "lint:off")
 
