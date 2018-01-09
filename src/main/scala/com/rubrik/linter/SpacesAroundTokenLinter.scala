@@ -3,6 +3,7 @@ package com.rubrik.linter
 import com.rubrik.linter.util.isWhiteSpace
 import scala.meta.Token
 import scala.meta.Tree
+import scala.meta.tokens.Tokens
 import scala.reflect.ClassTag
 
 /**
@@ -10,17 +11,19 @@ import scala.reflect.ClassTag
  * spaces before the a token of type [[T]] and exactly [[numSpacesAfter]]
  * after that token.
  */
-class SpacesAroundTokenLinter[T <: Token: ClassTag](
+abstract class SpacesAroundTokenLinter[T <: Token: ClassTag](
   numSpacesBefore: Int,
   numSpacesAfter: Int
 ) extends Linter {
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  def ignore(tokens: Tokens, tokenIndex: Int): Boolean
+
+  override final def lint(tree: Tree): Seq[LintResult] = {
     val tokens = tree.tokens
     tokens
       .zipWithIndex
       .collect {
-        case (token: T, idx: Int) =>
+        case (token: T, idx: Int) if !ignore(tokens, idx) =>
           val (
             prefix: IndexedSeq[Token],
             suffix: IndexedSeq[Token],

@@ -14,6 +14,8 @@ class LeftBraceLinterSpec extends FlatSpec with Matchers {
   behavior of "LeftBraceLinter"
 
   it should "not show lint errors for valid code" in {
+    assertLintError { "import foo.bar.{blah => bloop}" }
+    assertLintError { s"""println(s"hello $${world.name}")""" }
     assertLintError { "foo.map { case blah => _ }" }
 
 
@@ -32,6 +34,11 @@ class LeftBraceLinterSpec extends FlatSpec with Matchers {
          |                              ^
          |  42
          |}
+      """
+    }
+    assertLintError {
+      """|{42}
+         |^
       """
     }
     assertLintError {
