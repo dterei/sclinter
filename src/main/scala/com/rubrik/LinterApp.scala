@@ -12,6 +12,7 @@ import com.rubrik.linter.LintResult
 import com.rubrik.linter.LintResult.Severity
 import com.rubrik.linter.Linter
 import com.rubrik.linter.LiteralBooleanArgLinter
+import com.rubrik.linter.MessageForRequireLinter
 import com.rubrik.linter.MultilineAssignmentLinter
 import com.rubrik.linter.NewDateLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
@@ -46,6 +47,7 @@ object LinterApp {
       FunctionDeclarationLinter,
       LeftBraceLinter,
       LiteralBooleanArgLinter,
+      MessageForRequireLinter,
       MultilineAssignmentLinter,
       NewDateLinter,
       SingleSpaceAfterIfLinter,
