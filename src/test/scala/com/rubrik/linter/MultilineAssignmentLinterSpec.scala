@@ -10,6 +10,26 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
     }
   }
 
+  behavior of "numSpacesAfterAssignmentOp"
+
+  it should "correctly return the number of spaces after the `=` operator" in {
+    def spaceCount(src: String): Int = {
+      MultilineAssignmentLinter.numSpacesAfterAssignmentOp(
+        CodeSpec(src.stripMargin).code)
+    }
+
+    spaceCount { "val answer =42" } shouldBe 0
+    spaceCount { "val answer = 42" } shouldBe 1
+    spaceCount { "val answer =   42" } shouldBe 3
+    spaceCount {
+      """
+        |val answer =   blah
+        |  .bleh
+        |  .haha
+      """
+    } shouldBe 3
+  }
+
   behavior of MultilineAssignmentLinter.getClass.getSimpleName.init
 
   it should "not show lint errors for valid code" in {
