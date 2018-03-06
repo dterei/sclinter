@@ -18,6 +18,7 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
     assertLintError { "deleteAll(folder, really = true)" }
     assertLintError { "deleteAll(folder, true /* really */)" }
     assertLintError { "booleanOpt.getOrElse(true)"}
+    assertLintError { "Seq(true, false)"}
 
     assertLintError {
       """

@@ -32,8 +32,15 @@ import scala.meta.Tree
  */
 object LiteralBooleanArgLinter extends Linter {
 
+  /**
+   * We want to make exceptions in cases where literal arguments actually
+   * make sense, like a collection of booleans.
+   */
+  private val ExceptionalFunctions = Set("Seq", "List", "Array", "Set")
+
   private def lintResult(funCall: Term.Apply): Seq[LintResult] = {
     if (funCall.args.length == 1) return Seq.empty
+    if (ExceptionalFunctions.contains(funCall.fun.syntax)) return Seq.empty
 
     def uncommented(literal: Lit.Boolean): Boolean = {
       util.commentJustAfter(tree = funCall, subTree = literal).isEmpty
