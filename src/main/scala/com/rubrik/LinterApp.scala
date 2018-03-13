@@ -15,6 +15,7 @@ import com.rubrik.linter.LiteralBooleanArgLinter
 import com.rubrik.linter.MessageForRequireLinter
 import com.rubrik.linter.MultilineAssignmentLinter
 import com.rubrik.linter.NewDateLinter
+import com.rubrik.linter.ShouldNotBeLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
 import com.rubrik.linter.TrivialOptionLinter
 import java.nio.file.Paths
@@ -50,6 +51,7 @@ object LinterApp {
       MessageForRequireLinter,
       MultilineAssignmentLinter,
       NewDateLinter,
+      ShouldNotBeLinter,
       SingleSpaceAfterIfLinter,
       TrivialOptionLinter)
 
