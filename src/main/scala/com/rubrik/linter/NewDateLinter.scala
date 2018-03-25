@@ -1,6 +1,7 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.LintResult.Severity
+import java.nio.file.Path
 import scala.meta.Tree
 import scala.meta.XtensionQuasiquoteTerm
 
@@ -23,8 +24,9 @@ import scala.meta.XtensionQuasiquoteTerm
  * injecting a clock object and raises warnings.
  */
 object NewDateLinter extends Linter {
-  private def lintResult(newCall: Tree): LintResult = {
+  private def lintResult(newCall: Tree, path: Path): LintResult = {
     LintResult(
+      file = path,
       code = Some("NO-NEW-DATE"),
       severity = Some(Severity.Warning),
       line = Some(newCall.pos.startLine + 1),
@@ -32,15 +34,15 @@ object NewDateLinter extends Linter {
       message = "Inject a clock to use something like `clock.now` instead.")
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
       .collect {
         case newCall @ q"new Date(...$argss)" if argss.flatten.isEmpty =>
-          lintResult(newCall)
+          lintResult(newCall, path)
         case newCall @ q"new DateTime(...$argss)" if argss.flatten.isEmpty =>
-          lintResult(newCall)
-        case now @ q"Instant.now" => lintResult(now)
-        case now @ q"DateTime.now" => lintResult(now)
+          lintResult(newCall, path)
+        case now @ q"Instant.now" => lintResult(now, path)
+        case now @ q"DateTime.now" => lintResult(now, path)
       }
   }
 }

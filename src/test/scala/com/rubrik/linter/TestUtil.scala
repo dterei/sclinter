@@ -1,6 +1,7 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.LintResult.Severity
+import java.nio.file.Paths
 import org.scalatest.Matchers
 import scala.meta.Stat
 import scala.meta.XtensionParseInputLike
@@ -87,7 +88,8 @@ object TestUtil extends Matchers {
   def assertLintError(linter: Linter)(code: String): LintResultInspector = {
     val codeSpec = CodeSpec(code)
     val expectedCarets: Set[Caret] = codeSpec.carets.toSet
-    val results: Seq[LintResult] = linter.lint(codeSpec.code)
+    val results: Seq[LintResult] =
+      linter.lint(codeSpec.code, Paths.get("inconsequential/dummy.file"))
     val carets: Set[Caret] =
       results
         .map(error => Caret(error.line.get, error.char.get))

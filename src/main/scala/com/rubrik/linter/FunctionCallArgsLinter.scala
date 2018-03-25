@@ -5,6 +5,7 @@ import com.rubrik.linter.util.indent
 import com.rubrik.linter.util.leftAligned
 import com.rubrik.linter.util.sameLine
 import com.rubrik.linter.util.startOnSameLine
+import java.nio.file.Path
 import scala.meta.Term
 import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
@@ -62,7 +63,10 @@ object FunctionCallArgsLinter extends Linter {
     }
   }
 
-  private def lintResult(funCall: Term.Apply): Option[LintResult] = {
+  private def lintResult(
+    funCall: Term.Apply,
+    path: Path
+  ): Option[LintResult] = {
     val IndentSpec(indentRef, indentAmount, method) = indentSpec(funCall)
 
     val args = funCall.args
@@ -97,18 +101,20 @@ object FunctionCallArgsLinter extends Linter {
         None
       }
 
-    messageOpt.map(
+    messageOpt map { message =>
       LintResult(
-        _,
+        file = path,
+        message = message,
         code = Some("FUNCTION-CALL-ARGS"),
         name = Some("Function call arguments"),
         line = Some(method.pos.startLine + 1),
-        char = Some(method.pos.startColumn + 1)))
+        char = Some(method.pos.startColumn + 1))
+    }
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
-      .collect { case funCall: Term.Apply => lintResult(funCall) }
+      .collect { case funCall: Term.Apply => lintResult(funCall, path) }
       .flatten
   }
 }

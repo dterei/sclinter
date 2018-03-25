@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import java.nio.file.Path
 import scala.meta.Tree
 import scala.meta.XtensionQuasiquoteTerm
 
@@ -11,11 +12,12 @@ import scala.meta.XtensionQuasiquoteTerm
  *     in case the condition doesn't hold
  */
 object MessageForRequireLinter extends Linter {
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
       .collect {
         case funCall @ q"require($_)" =>  // catch single-arg `require`s
           LintResult(
+            file = path,
             message =
               "A message string should be the second argument for `require`.",
             code = Some("REQUIRE-MESSAGE"),

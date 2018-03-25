@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import java.nio.file.Path
 import scala.meta.Tree
 import scala.meta.XtensionQuasiquoteTerm
 
@@ -32,7 +33,7 @@ import scala.meta.XtensionQuasiquoteTerm
  * </code>
  */
 object ShouldNotBeLinter extends Linter {
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
       .collect {
         case q"$_ should not be empty" => None
@@ -40,6 +41,7 @@ object ShouldNotBeLinter extends Linter {
         case stmt @ q"$_ should not be $_" =>
           Some(
             LintResult(
+              file = path,
               message = "Use `should not equal` instead",
               code = Some("SHOULD-NOT-BE"),
               name = Some("Avoid `should not be`"),

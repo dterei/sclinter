@@ -1,6 +1,7 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.util.isWhiteSpace
+import java.nio.file.Path
 import scala.meta.Token
 import scala.meta.Tree
 import scala.meta.tokens.Tokens
@@ -18,7 +19,7 @@ abstract class SpacesAroundTokenLinter[T <: Token: ClassTag](
 
   def ignore(tokens: Tokens, tokenIndex: Int): Boolean
 
-  override final def lint(tree: Tree): Seq[LintResult] = {
+  override final def lint(tree: Tree, path: Path): Seq[LintResult] = {
     val tokens = tree.tokens
     tokens
       .zipWithIndex
@@ -60,6 +61,7 @@ abstract class SpacesAroundTokenLinter[T <: Token: ClassTag](
           if (expectedString != actualString) {
             Some(
               LintResult(
+                file = path,
                 original = Some(actualString),
                 replacement = Some(expectedString),
                 code = Some("SPACES-AROUND-TOKEN"),

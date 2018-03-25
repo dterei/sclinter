@@ -6,6 +6,7 @@ import com.rubrik.linter.util.matchingParen
 import com.rubrik.linter.util.openingParen
 import com.rubrik.linter.util.returnTypeColon
 import com.rubrik.linter.util.sameLine
+import java.nio.file.Path
 import scala.meta.Defn
 import scala.meta.Tree
 
@@ -31,7 +32,10 @@ object FunctionDeclarationLinter extends Linter {
   private[linter] val ClosingParenIndentCode = "FUNDEF-CLOSING-PAREN-INDENT"
   private[linter] val ReturnTypeCode = "FUNCTION-RETURN-TYPE"
 
-  private def lintResult(defn: Defn.Def): Option[LintResult] = {
+  private def lintResult(
+    defn: Defn.Def,
+    path: Path
+  ): Option[LintResult] = {
     val func = defn.name
     util
       .explicitlySpecifiedReturnType(defn)
@@ -45,6 +49,7 @@ object FunctionDeclarationLinter extends Linter {
             if (rParen.end != retTypeColon.start) {
               Some(
                 LintResult(
+                  file = path,
                   message =
                     "`:` should immediately follow `)`, " +
                       "making a reverse frown like `):`",
@@ -64,6 +69,7 @@ object FunctionDeclarationLinter extends Linter {
             ) {
               Some(
                 LintResult(
+                  file = path,
                   message =
                     "`)` should have same indentation as " +
                       s"`${firstNonEmptyToken(defn)}`.",
@@ -85,6 +91,7 @@ object FunctionDeclarationLinter extends Linter {
       .getOrElse {
         Some(
           LintResult(
+            file = path,
             message = s"Return type not specified for `$func`.",
             code = Some(ReturnTypeCode),
             name = Some("Function return type"),
@@ -93,9 +100,9 @@ object FunctionDeclarationLinter extends Linter {
       }
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
-      .collect { case defn: Defn.Def => lintResult(defn) }
+      .collect { case defn: Defn.Def => lintResult(defn, path) }
       .flatten
   }
 }

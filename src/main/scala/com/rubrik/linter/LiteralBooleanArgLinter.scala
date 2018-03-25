@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import java.nio.file.Path
 import scala.meta.Lit
 import scala.meta.Term
 import scala.meta.Tree
@@ -38,7 +39,7 @@ object LiteralBooleanArgLinter extends Linter {
    */
   private val ExceptionalFunctions = Set("Seq", "List", "Array", "Set")
 
-  private def lintResult(funCall: Term.Apply): Seq[LintResult] = {
+  private def lintResult(funCall: Term.Apply, path: Path): Seq[LintResult] = {
     if (funCall.args.length == 1) return Seq.empty
     if (ExceptionalFunctions.contains(funCall.fun.syntax)) return Seq.empty
 
@@ -55,6 +56,7 @@ object LiteralBooleanArgLinter extends Linter {
       .map {
         arg =>
           LintResult(
+            file = path,
             message =
               s"""Boolean literal arguments must be named.
                  |  Scala syntax: func(argName = $arg)
@@ -67,9 +69,9 @@ object LiteralBooleanArgLinter extends Linter {
       }
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
-      .collect { case funCall: Term.Apply => lintResult(funCall) }
+      .collect { case funCall: Term.Apply => lintResult(funCall, path) }
       .flatten
   }
 }

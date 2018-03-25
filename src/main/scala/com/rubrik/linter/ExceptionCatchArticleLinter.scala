@@ -1,6 +1,7 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.LintResult.Severity
+import java.nio.file.Path
 import scala.meta.Term.ApplyType
 import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
@@ -19,17 +20,20 @@ import scala.meta.quasiquotes.XtensionQuasiquoteTerm
  */
 object ExceptionCatchArticleLinter extends Linter {
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
       .collect {
-        case expr @ ApplyType(q"a", List(_)) => lintResultForA(expr)
-        case expr @ ApplyType(q"an", List(_)) => lintResultForAn(expr)
-        case expr @ ApplyType(q"the", List(_)) => lintResultForThe(expr)
+        case expr @ ApplyType(q"a", List(_)) => lintResultForA(expr, path)
+        case expr @ ApplyType(q"an", List(_)) => lintResultForAn(expr, path)
+        case expr @ ApplyType(q"the", List(_)) => lintResultForThe(expr, path)
       }
       .flatten
   }
 
-  private def lintResultForA(expr: ApplyType): Option[LintResult] = {
+  private def lintResultForA(
+    expr: ApplyType,
+    path: Path
+  ): Option[LintResult] = {
     val q"a [$exceptionType]" = expr
     if (isVowel(exceptionType.syntax.head)) {
       // Can only advice and not produce an error, because
@@ -37,6 +41,7 @@ object ExceptionCatchArticleLinter extends Linter {
       // the appropriate article is "a" and not "an".
       Some(
         LintResult(
+          file = path,
           message = s"Should `an` be used instead of `a`?",
           code = Some("EXCEPTION-TYPE-ARTICLE"),
           name = Some("Article used for exception type"),
@@ -46,17 +51,21 @@ object ExceptionCatchArticleLinter extends Linter {
           severity = Some(Severity.Advice),
           replacement = Some(s"an [$exceptionType]")))
     } else if (incorrectSpace(expr)) {
-      Some(spaceNeededLintResult(expr))
+      Some(spaceNeededLintResult(expr, path))
     } else {
       None
     }
   }
 
-  private def lintResultForAn(expr: ApplyType): Option[LintResult] = {
+  private def lintResultForAn(
+    expr: ApplyType,
+    path: Path
+  ): Option[LintResult] = {
     val q"an [$exceptionType]" = expr
     if (!isVowel(exceptionType.syntax.head)) {
       Some(
         LintResult(
+          file = path,
           message = s"`a` should be used instead of `an`.",
           code = Some("EXCEPTION-TYPE-ARTICLE"),
           name = Some("Article used for exception type"),
@@ -66,15 +75,18 @@ object ExceptionCatchArticleLinter extends Linter {
           severity = Some(Severity.Error),
           replacement = Some(s"a [$exceptionType]")))
     } else if (incorrectSpace(expr)) {
-      Some(spaceNeededLintResult(expr))
+      Some(spaceNeededLintResult(expr, path))
     } else {
       None
     }
   }
 
-  private def lintResultForThe(expr: ApplyType): Option[LintResult] = {
+  private def lintResultForThe(
+    expr: ApplyType,
+    path: Path
+  ): Option[LintResult] = {
     if (incorrectSpace(expr)) {
-      Some(spaceNeededLintResult(expr))
+      Some(spaceNeededLintResult(expr, path))
     } else {
       None
     }
@@ -94,9 +106,13 @@ object ExceptionCatchArticleLinter extends Linter {
     expr.syntax != idealSyntaxWithSpace
   }
 
-  private def spaceNeededLintResult(expr: ApplyType): LintResult = {
+  private def spaceNeededLintResult(
+    expr: ApplyType,
+    path: Path
+  ): LintResult = {
     val q"$article [$typ]" = expr
     LintResult(
+      file = path,
       message =
         s"There should be exactly one space between `$article` " +
           s"and `[$typ]`.",

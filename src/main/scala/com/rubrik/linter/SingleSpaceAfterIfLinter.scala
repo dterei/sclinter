@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import java.nio.file.Path
 import scala.meta.Term.If
 import scala.meta.Tree
 
@@ -13,12 +14,13 @@ object SingleSpaceAfterIfLinter extends Linter {
     stmt.syntax.replaceFirst("if\\s*\\(", "if (")
   }
 
-  private def lintResult(stmt: If): Option[LintResult] = {
+  private def lintResult(stmt: If, path: Path): Option[LintResult] = {
     if (stmt.syntax == replacementText(stmt)) {
       None
     } else {
       Some(
         LintResult(
+          file = path,
           message =
             "There must be exactly one space between `if` " +
               "and the opening parenthesis",
@@ -31,9 +33,9 @@ object SingleSpaceAfterIfLinter extends Linter {
     }
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
-      .collect { case stmt: If => lintResult(stmt) }
+      .collect { case stmt: If => lintResult(stmt, path) }
       .flatten
   }
 }

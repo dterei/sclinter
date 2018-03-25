@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import java.nio.file.Path
 import scala.meta.Token.Comment
 import scala.meta.Tree
 
@@ -28,7 +29,7 @@ object DocCommentLinter extends Linter {
     }
   }
 
-  private def lintResult(comment: Comment): Option[LintResult] = {
+  private def lintResult(comment: Comment, path: Path): Option[LintResult] = {
     val actual = comment.syntax
     val expected = correctlyIndented(comment)
     if (actual == expected) {
@@ -36,6 +37,7 @@ object DocCommentLinter extends Linter {
     } else {
       Some(
         LintResult(
+          file= path,
           message = "Documentation comments must follow javadoc style",
           code = Some("JAVADOC"),
           name = Some("Follow javadoc style"),
@@ -46,10 +48,10 @@ object DocCommentLinter extends Linter {
     }
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
       .tokens
-      .collect { case comment: Comment => lintResult(comment) }
+      .collect { case comment: Comment => lintResult(comment, path) }
       .flatten
   }
 }

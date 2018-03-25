@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import java.nio.file.Path
 import scala.meta.Tree
 import scala.meta.XtensionQuasiquoteTerm
 
@@ -35,11 +36,15 @@ import scala.meta.XtensionQuasiquoteTerm
  */
 object DanglingShouldBeLinter extends Linter {
 
-  private def lintResult(shouldBeInstance: Tree): Option[LintResult] = {
+  private def lintResult(
+    shouldBeInstance: Tree,
+    path: Path
+  ): Option[LintResult] = {
     val actual = shouldBeInstance.syntax
     val expected = actual.replaceFirst("should\\s+be", "shouldBe")
     Some(
       LintResult(
+        file = path,
         message = "use `shouldBe` instead of `should be`",
         code = Some("NO-SHOULD-BE"),
         line = Some(shouldBeInstance.pos.startLine + 1),
@@ -48,9 +53,11 @@ object DanglingShouldBeLinter extends Linter {
         replacement = Some(expected)))
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
-      .collect { case subtree @ q"$_ should be" => lintResult(subtree) }
+      .collect {
+        case subtree @ q"$_ should be" => lintResult(subtree, path)
+      }
       .flatten
   }
 }

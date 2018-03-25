@@ -18,6 +18,7 @@ import com.rubrik.linter.NewDateLinter
 import com.rubrik.linter.ShouldNotBeLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
 import com.rubrik.linter.TrivialOptionLinter
+import java.nio.file.Path
 import java.nio.file.Paths
 import play.api.libs.json.Json
 import scala.meta.Source
@@ -61,7 +62,8 @@ object LinterApp {
     CommentOffPrefixes.exists(comment.value.trim.startsWith)
   }
 
-  def lintResults(sourceCode: String): Seq[LintResult] = {
+  def lintResults(path: Path): Seq[LintResult] = {
+    val sourceCode = scala.io.Source.fromFile(path.toFile).mkString
     try {
       val source = sourceCode.parse[Source].get
       val lineNosToIgnore: Set[Int] =
@@ -73,7 +75,7 @@ object LinterApp {
           .toSet
 
       linters
-        .flatMap(_.lint(source))
+        .flatMap(_.lint(source, path))
         .filterNot(_.line.exists(lineNosToIgnore))
         // TODO(sujeet): once we're ready for errors to appear
         // in parts of file that aren't touched in a diff, stop
@@ -93,6 +95,7 @@ object LinterApp {
       case e: ParseException =>
         Seq(
           LintResult(
+            file = path,
             message = e.shortMessage,
             code = Some("SYNTAX-ERROR"),
             name = Some("Scala syntax error"),
@@ -103,9 +106,12 @@ object LinterApp {
   }
 
   def main(args: Array[String]): Unit = {
-    val path = Paths.get(args(0))
-    val sourceText = scala.io.Source.fromFile(path.toFile).mkString
-    val results = lintResults(sourceText)
-    println(Json.prettyPrint(Json.toJson(results)))
+    val paths = args.map(Paths.get(_))
+    val results =
+      paths
+        .filter(_.toFile.isFile)
+        .par
+        .flatMap(lintResults)
+    println(Json.prettyPrint(Json.toJson(results.toArray)))
   }
 }

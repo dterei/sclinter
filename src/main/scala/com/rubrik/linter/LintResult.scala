@@ -4,11 +4,17 @@ import com.rubrik.linter.LintResult.Severity
 import enumeratum.Enum
 import enumeratum.EnumEntry
 import enumeratum.PlayJsonEnum
+import java.nio.file.Path
+import java.nio.file.Paths
 import play.api.libs.json.Format
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsString
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import scala.collection.immutable.IndexedSeq
 
 /**
+ * @param file [[Path]] of the file being linted.
  * @param message Text describing the lint message. For example,
  *                "This is a syntax error.".
  * @param name Text summarizing the lint message. For example, "Syntax Error".
@@ -26,6 +32,7 @@ import scala.collection.immutable.IndexedSeq
  *             all whitespace messages, for example.
  */
 case class LintResult(
+  file: Path,
   message: String,
   name: Option[String] = None,
   severity: Option[Severity] = None,
@@ -48,5 +55,11 @@ object LintResult {
     case object Warning extends Severity
   }
 
+  implicit object PathFormat extends Format[Path] {
+    override def writes(path: Path): JsValue = JsString(path.toString)
+    override def reads(json: JsValue): JsResult[Path] = {
+      json.validate[String].map(Paths.get(_))
+    }
+  }
   implicit val jsonFormat: Format[LintResult] = Json.format[LintResult]
 }

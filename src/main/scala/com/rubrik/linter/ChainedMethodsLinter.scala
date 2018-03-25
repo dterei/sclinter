@@ -5,6 +5,7 @@ import com.rubrik.linter.util.indent
 import com.rubrik.linter.util.isCompleteCallChain
 import com.rubrik.linter.util.leftAligned
 import com.rubrik.linter.util.startOnSameLine
+import java.nio.file.Path
 import scala.meta.Term
 import scala.meta.Tree
 
@@ -30,7 +31,7 @@ object ChainedMethodsLinter extends Linter {
       s"${terms.map(term => s"`$term`").mkString(", ")}."
   }
 
-  private def lintResult(callChain: Tree): Option[LintResult] = {
+  private def lintResult(callChain: Tree, path: Path): Option[LintResult] = {
     val chainMembers = getCallChainComponents(callChain)
     val memberNames = chainMembers.map(_.name)
     if (startOnSameLine(memberNames: _*)) {
@@ -83,6 +84,7 @@ object ChainedMethodsLinter extends Linter {
       messageOpt.map(
         message =>
           LintResult(
+            file = path,
             message = message,
             code = Some("CHAIN-ALIGN"),
             name = Some("Multiline method chaining"),
@@ -91,10 +93,10 @@ object ChainedMethodsLinter extends Linter {
     }
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree
       .collect {
-        case subtree if isCompleteCallChain(subtree) => lintResult(subtree)
+        case subtree if isCompleteCallChain(subtree) => lintResult(subtree, path)
       }
       .flatten
   }

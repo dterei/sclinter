@@ -2,6 +2,7 @@ package com.rubrik.linter
 
 import com.rubrik.linter.util.startOnSameLine
 import com.rubrik.linter.util.multiline
+import java.nio.file.Path
 import scala.meta.Term.Block
 import scala.meta.Tree
 import scala.meta.quasiquotes.XtensionQuasiquoteTerm
@@ -49,9 +50,11 @@ object MultilineAssignmentLinter extends Linter {
   private def lintResult(
     stmt: Tree,
     variable: Tree,
-    expr: Tree
+    expr: Tree,
+    path: Path
   ): LintResult = {
     LintResult(
+      file = path,
       message = "Break line after the assignment operator (=)",
       code = Some("NEWLINE-POST-ASSIGN"),
       name = Some("Multiline assignment"),
@@ -61,12 +64,12 @@ object MultilineAssignmentLinter extends Linter {
       replacement = Some(replacementText(variable, expr)))
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
     tree collect {
       case stmt @ q"val $variable = $expr" if invalid(variable, expr) =>
-        lintResult(stmt, variable, expr)
+        lintResult(stmt, variable, expr, path)
       case stmt @ q"val $variable: $typ = $expr" if invalid(variable, expr) =>
-        lintResult(stmt, variable, expr)
+        lintResult(stmt, variable, expr, path)
     }
   }
 }

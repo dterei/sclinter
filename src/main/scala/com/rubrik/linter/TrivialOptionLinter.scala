@@ -1,6 +1,7 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.LintResult.Severity
+import java.nio.file.Path
 import scala.meta.Lit
 import scala.meta.Tree
 import scala.meta.XtensionQuasiquoteTerm
@@ -13,7 +14,10 @@ import scala.meta.XtensionQuasiquoteTerm
  */
 object TrivialOptionLinter extends Linter {
 
-  private[linter] def lintResult(opt: Tree): Option[LintResult] = {
+  private[linter] def lintResult(
+    opt: Tree,
+    path: Path
+  ): Option[LintResult] = {
     val q"Option($arg)" = opt
     val replacementTextOpt =
       arg match {
@@ -24,6 +28,7 @@ object TrivialOptionLinter extends Linter {
     replacementTextOpt.map(
       replacement =>
         LintResult(
+          file = path,
           code = Some("USE-SOME"),
           severity = Some(Severity.Warning),
           line = Some(opt.pos.startLine + 1),
@@ -35,7 +40,11 @@ object TrivialOptionLinter extends Linter {
               "known to be `null` or non-`null`."))
   }
 
-  override def lint(tree: Tree): Seq[LintResult] = {
-    tree.collect { case opt @ q"Option($_)" => lintResult(opt) }.flatten
+  override def lint(tree: Tree, path: Path): Seq[LintResult] = {
+    tree
+      .collect {
+        case opt @ q"Option($_)" => lintResult(opt, path)
+      }
+      .flatten
   }
 }
