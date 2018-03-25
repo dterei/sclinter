@@ -1,3 +1,0 @@
-[submodule ".arcanist-external-json-linter"]
-	path = .arcanist-external-json-linter
-	url = https://github.com/bgamari/arcanist-external-json-linter.git

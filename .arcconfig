@@ -1,7 +1,7 @@
 {
   "phabricator.uri": "https://phabricator.rubrik.com/",
   "load": [
-    ".arcanist-external-json-linter",
+    "lint",
     "unit"
   ],
   "unit.engine": "ScalaLinterTestEngine"
