@@ -20,17 +20,17 @@
  *
  * == Script and JSON format ==
  *
- * The script will be invoked once and list of files to be linted will be passed,
- * as arguments to it. The file may begin with a "-"; ensure
+ * The script will be invoked once and list of files to be linted will be
+ * passed as arguments to it. The file may begin with a "-"; ensure
  * your script will not interpret such files as flags (perhaps by ending your
  * script configuration with "--", if its argument parser supports that).
  *
  * Note that when run via `arc diff`, the list of files to be linted includes
  * deleted files and files that were moved away by the change. The linter should
- * not assume any of the paths it is given exists, and it is not an error for the
- * linter to be invoked with paths which are no longer there. (Every affected
- * path is subject to lint because some linters may raise errors in other files
- * when a file is removed, or raise an error about its removal.)
+ * not assume any of the paths it is given exists, and it is not an error for
+ * the linter to be invoked with paths which are no longer there. (Every 
+ * affected path is subject to lint because some linters may raise errors
+ * in other files when a file is removed, or raise an error about its removal.)
  *
  * The script should emit a JSON array of lint violations to stdout. A lint
  * violation may have the following attributes,
