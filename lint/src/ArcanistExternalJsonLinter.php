@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Simple glue linter which runs some script on each path and parses
- * lint violations emitted by the script in JSON format.
+ * Simple glue linter which passes the list of paths to a script
+ * and parses lint violations emitted by the script in JSON format.
  *
  * Configure this linter by setting these keys in your .arclint section:
  *
@@ -20,14 +20,14 @@
  *
  * == Script and JSON format ==
  *
- * The script will be invoked once for each file that is to be linted, with
- * the file passed as the first argument. The file may begin with a "-"; ensure
+ * The script will be invoked once and list of files to be linted will be passed,
+ * as arguments to it. The file may begin with a "-"; ensure
  * your script will not interpret such files as flags (perhaps by ending your
  * script configuration with "--", if its argument parser supports that).
  *
  * Note that when run via `arc diff`, the list of files to be linted includes
  * deleted files and files that were moved away by the change. The linter should
- * not assume the path it is given exists, and it is not an error for the
+ * not assume any of the paths it is given exists, and it is not an error for the
  * linter to be invoked with paths which are no longer there. (Every affected
  * path is subject to lint because some linters may raise errors in other files
  * when a file is removed, or raise an error about its removal.)
@@ -35,16 +35,13 @@
  * The script should emit a JSON array of lint violations to stdout. A lint
  * violation may have the following attributes,
  *
+ *   - `file` (required) The name of the file to raise the lint message in.
  *   - `message` (required) Text describing the lint message. For example,
  *     "This is a syntax error.".
  *   - `name` (optional) Text summarizing the lint message. For example,
  *     "Syntax Error".
  *   - `severity` (optional) The word "error", "warning", "autofix", "advice",
  *     or "disabled", in any combination of upper and lower case. Instead, you
- *   - `file` (optional) The name of the file to raise the lint message in. If
- *     not specified, defaults to the linted file. It is generally not necessary
- *     to specify this unless the linter can raise messages in files other than
- *     the one it is linting.
  *   - `line` (optional) The line number of the message.
  *   - `char` (optional) The character offset of the message.
  *   - `offset` (optional) The byte offset of the message. If provided, this
@@ -64,8 +61,19 @@
  *
  * For example, the following would encode a warning and an error,
  *
- *   [ { 'message': 'Too many goats!', 'line': 13, 'severity': 'error' }
- *   , { 'message': 'Not enough boats.', 'line': 22, 'severity: 'warning' }
+ *   [
+ *     {
+ *       'message': 'Too many goats!',
+ *       'line': 13,
+ *       'severity': 'error',
+ *       'file': 'foo/bar/blah.bleh'
+ *     },
+ *     {
+ *       'message': 'Not enough boats.',
+ *       'line': 22,
+ *       'severity: 'warning',
+ *       'file': 'path/to/a/file.ext'
+       }
  *   ]
  *
  * @task  lint        Linting
@@ -76,7 +84,7 @@
 final class ArcanistExternalJsonLinter extends ArcanistLinter {
 
   private $script = null;
-  private $output = array();
+  private $output = "";
 
   public function getInfoName() {
     return pht('External JSON');
@@ -110,41 +118,29 @@ final class ArcanistExternalJsonLinter extends ArcanistLinter {
 
 
   /**
-   * Run the script on each file to be linted.
+   * Pass the list of files to the script, and get the output.
    *
    * @task lint
    */
   public function willLintPaths(array $paths) {
     $root = $this->getProjectRoot();
 
-    $futures = array();
-    foreach ($paths as $path) {
-      $future = new ExecFuture('%C %s', $this->script, $path);
-      $future->setCWD($root);
-      $futures[$path] = $future;
-    }
-
-    $futures = id(new FutureIterator($futures))
-      ->limit(4);
-    foreach ($futures as $path => $future) {
-      list($stdout) = $future->resolvex();
-      $this->output[$path] = $stdout;
-    }
+    $future = new ExecFuture('%C %Ls', $this->script, $paths);
+    list($this->output) = $future->resolvex();
   }
 
   /**
-   * Run the regex on the output of the script.
+   * Parse the output produced by the script.
    *
    * @task lint
    */
-  public function lintPath($path) {
-    $output = idx($this->output, $path);
-    if (!strlen($output)) {
+  public function didLintPaths(array $paths) {
+    if (!strlen($this->output)) {
       // No output, but it exited 0, so just move on.
       return;
     }
 
-    $messages = phutil_json_decode($output, true);
+    $messages = phutil_json_decode($this->output, true);
 
     foreach ($messages as $message) {
       if (!empty($message['throw'])) {
@@ -169,7 +165,7 @@ final class ArcanistExternalJsonLinter extends ArcanistLinter {
           $char = null;
       }
 
-      $path = idx($message, 'file', $path);
+      $path = idx($message, 'file');
       $code = idx($message, 'code', $this->getLinterName());
       $severity = $this->getMessageSeverity($message);
       $name = idx($message, 'name', 'Lint');

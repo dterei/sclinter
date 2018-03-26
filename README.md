@@ -30,7 +30,7 @@ Load the linter in `.arcconfig`
   "conduit_uri": "https://example.org",
 
   "load": [
-    ".scala-linter/.arcanist-external-json-linter"
+    ".scala-linter/lint"
   ]
 }
 ```
