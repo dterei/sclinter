@@ -73,7 +73,7 @@
  *       'line': 22,
  *       'severity: 'warning',
  *       'file': 'path/to/a/file.ext'
-       }
+ *     }
  *   ]
  *
  * @task  lint        Linting
