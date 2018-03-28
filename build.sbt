@@ -2,7 +2,7 @@ name := "scala-linter"
 
 version := "0.1"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.5"
 
 libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum" % "1.5.12",

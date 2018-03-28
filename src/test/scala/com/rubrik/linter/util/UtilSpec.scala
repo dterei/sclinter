@@ -37,7 +37,7 @@ class UtilSpec extends FlatSpec with Matchers {
       .parse[Stat]
       .get
 
-  private val q"def $func($arg1, $arg2, $arg3): $t = $body" = defn
+  private val q"def $func($arg1, $arg2, $arg3): $_ = $body" = defn
 
   it should "correctly tell multiline trees from single-line ones" in {
     sameLine(func) shouldBe true
