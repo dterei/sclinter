@@ -4,5 +4,6 @@
 #
 
 cd $(git rev-parse --show-toplevel)
-sbt assembly
-git add target/scala-2.12/scala-linter-assembly-0.1.jar
+
+sbt sclinterJVM/assembly
+git add jvm/target/scala-2.12/sclinter-assembly-0.1.jar

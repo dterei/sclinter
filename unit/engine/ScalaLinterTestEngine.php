@@ -16,15 +16,19 @@ final class ScalaLinterTestEngine extends ArcanistUnitTestEngine {
 
   public function run() {
     $project_root = $this->getWorkingCopy()->getProjectRoot();
-    $reports_dir = 'target/test-reports';
-    $coverage_file = 'target/scala-2.12/coverage-report/cobertura.xml';
+    $reports_dir = 'jvm/target/test-reports';
+    $coverage_file = 'jvm/target/scala-2.12/coverage-report/cobertura.xml';
     $clear_reports_cmd = csprintf(
       'cd %s; rm -rf %s;',
       $project_root,
       $reports_dir
     );
     
-    $test_cmd = $clear_reports_cmd.'sbt coverage test coverageReport;';
+    $test_cmd = $clear_reports_cmd
+               .'sbt coverage '
+               .'sclinterJVM/test '
+               .'sclinterJVM/coverageReport;';
+
     $this->execCmd($test_cmd);
 
     $all_results = array();
@@ -77,9 +81,13 @@ final class ScalaLinterTestEngine extends ArcanistUnitTestEngine {
     $classes = $coverage_dom->getElementsByTagName('class');
 
     foreach ($classes as $class) {
-      // filename as mentioned in the report is relative to `src/main/scala/`,
+      // filename as mentioned in the report is relative to
+      // either `shared/src/main/scala/` or `jvm/src/main/scala`,
       // but it needs to be relative to the project root.
-      $relative_path = 'src/main/scala/'.$class->getAttribute('filename');
+      $relative_path = 'shared/src/main/scala/'.$class->getAttribute('filename');
+      if (!Filesystem::pathExists($relative_path)) {
+        $relative_path = 'jvm/src/main/scala/'.$class->getAttribute('filename');
+      }
       $absolute_path = Filesystem::resolvePath($relative_path);
 
       // skip reporting coverage for files that aren't in the diff

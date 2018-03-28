@@ -3,7 +3,7 @@
     "scala-linter": {
       "type": "external-json",
       "include": "(\\.scala$)",
-      "external-json.script": "java -jar target/scala-2.12/scala-linter-assembly-0.1.jar $1"
+      "external-json.script": "java -jar jvm/target/scala-2.12/sclinter-assembly-0.1.jar $1"
     }
   }
 }

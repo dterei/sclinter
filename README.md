@@ -7,7 +7,7 @@
 eventually encode [Rubrik's scala formatting guide](https://goo.gl/AjwKBy)
 completely.
 
-`sclinter` provides a [jar](target/scala-2.12/scala-linter-assembly-0.1.jar)
+`sclinter` provides a [jar](jvm/target/scala-2.12/sclinter-assembly-0.1.jar)
 that produces lint output in JSON format directly consumable by
 [`external-json-linter`](https://github.com/ghc/arcanist-external-json-linter)
 for arcanist.
@@ -19,7 +19,7 @@ First add this repository as a submodule of the project:
 cd $(git rev-parse --show-toplevel)
 
 # Add submodule
-git submodule add git@github.com:scaledata/sclinter.git .scala-linter
+git submodule add git@github.com:scaledata/sclinter.git .sclinter
 git submodule update --init --recursive
 ```
 
@@ -30,7 +30,7 @@ Load the linter in `.arcconfig`
   "conduit_uri": "https://example.org",
 
   "load": [
-    ".scala-linter/lint"
+    ".sclinter/lint"
   ]
 }
 ```
@@ -42,7 +42,7 @@ Add the linter to `.arclint`:
     "scala-linter": {
       "type": "external-json",
       "include": "(\\.scala$)",
-      "external-json.script": "java -jar .scala-linter/target/scala-2.12/scala-linter-assembly-0.1.jar $1"
+      "external-json.script": "java -jar .sclinter/jvm/target/scala-2.12/sclinter-assembly-0.1.jar $1"
     }
   }
 }
@@ -77,7 +77,7 @@ cd sclinter
 ./setup-git.sh
 
 # build
-sbt assembly
+sbt sclinterJVM/assembly
 
 # only test
 sbt test
