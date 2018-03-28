@@ -6,10 +6,9 @@ scalaVersion := "2.12.5"
 
 libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum" % "1.5.12",
-  "com.beachape" %% "enumeratum-play-json" % "1.5.12-2.6.0-M7",
+  "com.lihaoyi" %% "upickle" % "0.6.2",
   "org.scalameta" %% "scalameta" % "2.1.3",
   "org.scalatest" %% "scalatest" % "3.0.4" % "test",
-  "com.typesafe.play" %% "play-json" % "2.6.6"
 )
 
 testOptions in Test +=
@@ -43,7 +42,6 @@ scalacOptions ++= Seq(
   "-Xlint:unsound-match",
   "-Yno-adapted-args",
   "-Ypartial-unification",
-  "-Ywarn-dead-code",
   "-Ywarn-extra-implicit",
   "-Ywarn-inaccessible",
   "-Ywarn-infer-any",

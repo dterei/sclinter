@@ -1,16 +1,13 @@
 package com.rubrik.linter
 
+import com.rubrik.json.OptionPickler.macroRW
+import com.rubrik.json.OptionPickler.ReadWriter
+import com.rubrik.json.OptionPickler.readwriter
 import com.rubrik.linter.LintResult.Severity
 import enumeratum.Enum
 import enumeratum.EnumEntry
-import enumeratum.PlayJsonEnum
 import java.nio.file.Path
 import java.nio.file.Paths
-import play.api.libs.json.Format
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsString
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import scala.collection.immutable.IndexedSeq
 
 /**
@@ -44,9 +41,8 @@ case class LintResult(
 )
 
 object LintResult {
-
   sealed trait Severity extends EnumEntry
-  object Severity extends Enum[Severity] with PlayJsonEnum[Severity] {
+  object Severity extends Enum[Severity] {
     val values: IndexedSeq[Severity] = findValues
     case object Advice extends Severity
     case object Autofix extends Severity
@@ -55,11 +51,11 @@ object LintResult {
     case object Warning extends Severity
   }
 
-  implicit object PathFormat extends Format[Path] {
-    override def writes(path: Path): JsValue = JsString(path.toString)
-    override def reads(json: JsValue): JsResult[Path] = {
-      json.validate[String].map(Paths.get(_))
-    }
-  }
-  implicit val jsonFormat: Format[LintResult] = Json.format[LintResult]
+  implicit val severityRw: ReadWriter[Severity] =
+    readwriter[String].bimap[Severity](_.entryName, Severity.withName)
+
+  implicit val pathRw: ReadWriter[Path] =
+    readwriter[String].bimap[Path](_.toString, Paths.get(_))
+
+  implicit val rw: ReadWriter[LintResult] = macroRW[LintResult]
 }

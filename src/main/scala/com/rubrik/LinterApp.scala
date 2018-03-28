@@ -1,5 +1,6 @@
 package com.rubrik
 
+import com.rubrik.json.OptionPickler.write
 import com.rubrik.linter.ChainedMethodsLinter
 import com.rubrik.linter.ColonLinter
 import com.rubrik.linter.DanglingShouldBeLinter
@@ -20,7 +21,6 @@ import com.rubrik.linter.SingleSpaceAfterIfLinter
 import com.rubrik.linter.TrivialOptionLinter
 import java.nio.file.Path
 import java.nio.file.Paths
-import play.api.libs.json.Json
 import scala.meta.Source
 import scala.meta.XtensionParseInputLike
 import scala.meta.parsers.ParseException
@@ -36,7 +36,6 @@ import scala.meta.tokens.Token.Comment
  * The scala version of the format can found in [[LintResult]].
  */
 object LinterApp {
-  import LintResult.jsonFormat
 
   val linters: List[Linter] =
     List(
@@ -112,6 +111,6 @@ object LinterApp {
         .filter(_.toFile.isFile)
         .par
         .flatMap(lintResults)
-    println(Json.prettyPrint(Json.toJson(results.toArray)))
+    println(write(results.toList))
   }
 }
