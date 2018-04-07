@@ -5,7 +5,7 @@ lazy val sclinter =
     .in(file("."))
     .settings(
       name := "sclinter",
-      version := "0.1",
+      version := "0.1.0",
       scalaVersion := "2.12.5",
       jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
 
@@ -65,6 +65,11 @@ lazy val sclinter =
       testOptions in Test ++= Seq(
         Tests.Argument("-oDF"),
       ),
+
+      assemblyJarName in assembly := s"${name.value}.jar",
+
+      // Skip tests during assembly
+      test in assembly := {},
     )
     .jvmSettings(
       libraryDependencies ++= Seq(

@@ -10,16 +10,19 @@ before_deploy:
   # Set up git user name and tag this commit
   - git config --local user.name "Sujeet Kausallya Gholap"
   - git config --local user.email "sujeetgholap+travis@gmail.com"
-  - git tag "$(git log --format=%h -1)"
-  # Remove the profiling overhead adde to the classes
-  # that was used for generating the coverage info during test
-  - sbt clean sclinterJVM/assembly
+  - git tag "$(grep 'version :=' build.sbt | cut -d \" -f2)"
+  # `clean` to remove the profiling overhead added to the
+  # classes for generating the coverage info during test
+  - sbt clean sclinterJVM/assembly sclinterJS/fullOptJS
+  - cp jvm/target/scala-2.12/sclinter.jar ./
+  - cp js/target/scala-2.12/sclinter-opt.js ./sclinter.js
+  - zip -r sclinter.zip sclinter.jar sclinter.js lint
 
 deploy:
   provider: releases
   skip_cleanup: true
   overwrite: true
-  file: jvm/target/scala-2.12/sclinter-assembly-0.1.jar
+  file: sclinter.zip
   api_key:
     secure:
       "DIW1niVftSbZVD9lbZNOIlNqlQIrX+x1k5cBSIwfTWGJBQYpIcxS56d3\
