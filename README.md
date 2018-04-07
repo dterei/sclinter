@@ -1,5 +1,6 @@
 # sclinter
 [![Build Status](https://img.shields.io/travis/scaledata/sclinter.svg)](https://travis-ci.org/scaledata/sclinter)
+[![GitHub release](https://img.shields.io/github/release/scaledata/sclinter.svg)](https://github.com/scaledata/sclinter/releases/latest)
 [![Test Coverage](https://img.shields.io/codecov/c/github/scaledata/sclinter.svg)](https://codecov.io/gh/scaledata/sclinter)
 [![Codacy Grade](https://img.shields.io/codacy/grade/b6b3db4f4c1242aea2f9961f781c4307.svg)](https://www.codacy.com/app/sujeet_2/sclinter)
 
@@ -7,42 +8,50 @@
 eventually encode [Rubrik's scala formatting guide](https://goo.gl/AjwKBy)
 completely.
 
-`sclinter` provides a [jar](jvm/target/scala-2.12/sclinter-assembly-0.1.jar)
+`sclinter` provides both
+[a `.jar` file, and a `.js` file](https://github.com/scaledata/sclinter/releases/latest)
 that produces lint output in JSON format directly consumable by
-[`external-json-linter`](https://github.com/ghc/arcanist-external-json-linter)
+[`external-json-linter`](lint/src/ArcanistExternalJsonLinter.php)
 for arcanist.
 
 ## Installation
-First add this repository as a submodule of the project:
-```bash
-# go to project root
-cd $(git rev-parse --show-toplevel)
 
-# Add submodule
-git submodule add git@github.com:scaledata/sclinter.git .sclinter
-git submodule update --init --recursive
-```
+#### [Download](https://github.com/scaledata/sclinter/releases/latest)
+and extract it in a folder, say `/opt/usr/lib/sclinter`
 
-Load the linter in `.arcconfig`
+#### Load the linter in `.arcconfig`
 ```json
 {
   "project_id": "my-awesome-project",
   "conduit_uri": "https://example.org",
 
   "load": [
-    ".sclinter/lint"
+    "/opt/usr/lib/sclinter/lint"
   ]
 }
 ```
 
-Add the linter to `.arclint`:
+#### Add the linter to `.arclint` (invoked with JVM, runs faster)
 ```json
 {
   "linters": {
     "scala-linter": {
       "type": "external-json",
       "include": "(\\.scala$)",
-      "external-json.script": "java -jar .sclinter/jvm/target/scala-2.12/sclinter-assembly-0.1.jar $1"
+      "external-json.script": "java -jar /opt/usr/lib/sclinter/sclitner.jar $1"
+    }
+  }
+}
+```
+
+#### Or, add the linter to `.arclint` (invoked with `node`, slower)
+```json
+{
+  "linters": {
+    "scala-linter": {
+      "type": "external-json",
+      "include": "(\\.scala$)",
+      "external-json.script": "node /opt/usr/lib/sclinter/sclitner.js $1"
     }
   }
 }
@@ -74,10 +83,10 @@ Install `sbt` by following the
 ```bash
 git clone https://github.com/scaledata/sclinter.git
 cd sclinter
-./setup-git.sh
 
 # build
-sbt sclinterJVM/assembly
+sbt sclinterJVM/assembly # builds the jar
+sbt sclinterJS/fastOptJS # builds the JS file
 
 # only test
 sbt test
