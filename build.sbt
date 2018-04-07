@@ -1,3 +1,4 @@
+
 lazy val sclinter =
   crossProject
     .crossType(CrossType.Full)
@@ -6,6 +7,7 @@ lazy val sclinter =
       name := "sclinter",
       version := "0.1",
       scalaVersion := "2.12.5",
+      jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
 
       libraryDependencies ++= Seq(
         "com.beachape" %%% "enumeratum" % "1.5.12",
@@ -65,6 +67,10 @@ lazy val sclinter =
       ),
     )
     .jvmSettings(
+      libraryDependencies ++= Seq(
+        "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided",
+      ),
+
       testOptions in Test ++= Seq(
         Tests.Argument(
           TestFrameworks.ScalaTest, "-u", "jvm/target/test-reports"),
@@ -73,6 +79,10 @@ lazy val sclinter =
     .jsSettings(
       // Uncomment the following if we ever have a JS main module
       // scalaJSUseMainModuleInitializer := true,
+      scalaJSOutputWrapper := (
+        "global.require = require;",
+        "LinterApp.lint.apply(LinterApp, process.argv.slice(2));"
+      ),
     )
 
 lazy val sclinterJVM = sclinter.jvm

@@ -1,34 +1,16 @@
 package com.rubrik
 
-import com.rubrik.linter.TestUtil.descriptor
 import com.rubrik.LinterApp.CommentOffPrefixes
 import com.rubrik.LinterApp.lintResults
 import com.rubrik.linter.LintResult
-import java.io.FileWriter
-import java.nio.file.Files
-import java.nio.file.Path
+import com.rubrik.linter.TestUtil.descriptor
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class LinterAppSpec extends FlatSpec with Matchers {
-  private def tempFileContaining[R](
-    content: String
-  )(
-    block: Path => R
-  ): R = {
-    val tempFile = Files.createTempFile("linter", "spec")
-    try {
-      val writer = new FileWriter(tempFile.toFile)
-      writer.write(content)
-      writer.flush()
-      block(tempFile.toAbsolutePath)
-    } finally {
-      Files.delete(tempFile)
-    }
-  }
 
   private def lint(sourceText: String): Seq[LintResult] = {
-    tempFileContaining(sourceText)(lintResults)
+    lintResults(sourceCode = sourceText, path = "dummy/path/that/matters.not")
   }
 
   behavior of descriptor(LinterApp)

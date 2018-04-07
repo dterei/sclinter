@@ -19,12 +19,12 @@ import com.rubrik.linter.NewDateLinter
 import com.rubrik.linter.ShouldNotBeLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
 import com.rubrik.linter.TrivialOptionLinter
-import java.nio.file.Path
-import java.nio.file.Paths
 import scala.meta.Source
 import scala.meta.XtensionParseInputLike
 import scala.meta.parsers.ParseException
 import scala.meta.tokens.Token.Comment
+import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.JSExportTopLevel
 
 /**
  * Invoked with a single argument.
@@ -35,7 +35,7 @@ import scala.meta.tokens.Token.Comment
  *
  * The scala version of the format can found in [[LintResult]].
  */
-object LinterApp {
+@JSExportTopLevel("LinterApp") object LinterApp {
 
   val linters: List[Linter] =
     List(
@@ -61,8 +61,7 @@ object LinterApp {
     CommentOffPrefixes.exists(comment.value.trim.startsWith)
   }
 
-  def lintResults(path: Path): Seq[LintResult] = {
-    val sourceCode = scala.io.Source.fromFile(path.toFile).mkString
+  def lintResults(sourceCode: String, path: String): Seq[LintResult] = {
     try {
       val source = sourceCode.parse[Source].get
       val lineNosToIgnore: Set[Int] =
@@ -76,7 +75,7 @@ object LinterApp {
       linters
         .flatMap(_.lint(source))
         .filterNot(_.line.exists(lineNosToIgnore))
-        .map(_.copy(file = Some(path.toString)))
+        .map(_.copy(file = Some(path)))
         // TODO(sujeet): once we're ready for errors to appear
         // in parts of file that aren't touched in a diff, stop
         // making everything into a warning.
@@ -95,7 +94,7 @@ object LinterApp {
       case e: ParseException =>
         Seq(
           LintResult(
-            file = Some(path.toString),
+            file = Some(path),
             message = e.shortMessage,
             code = Some("SYNTAX-ERROR"),
             name = Some("Scala syntax error"),
@@ -106,8 +105,18 @@ object LinterApp {
   }
 
   def main(args: Array[String]): Unit = {
-    val paths = args.map(Paths.get(_)).toSeq
-    val results = paths.filter(_.toFile.isFile).par.flatMap(lintResults)
+    val results =
+      com.rubrik.parallel
+        .makeParallel(args.toSeq)
+        .filter(com.rubrik.io.isFile)
+        .map(path => path -> com.rubrik.io.readFile(path))
+        .flatMap {
+          case (path, sourceCode) => lintResults(sourceCode, path)
+        }
+
+
     println(write(results.toList))
   }
+
+  @JSExport def lint(paths: String*): Unit = main(paths.toArray)
 }
