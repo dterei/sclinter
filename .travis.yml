@@ -5,6 +5,7 @@ branches:
     - master
 
 script:
+  - function version() { grep 'version :=' build.sbt | cut -d \" -f2 }
   - sbt clean coverage sclinterJVM/test sclinterJVM/coverageReport
 
 after_success:
@@ -14,7 +15,7 @@ before_deploy:
   # Set up git user name and tag this commit
   - git config --local user.name "Sujeet Kausallya Gholap"
   - git config --local user.email "sujeetgholap+travis@gmail.com"
-  - git tag "$(grep 'version :=' build.sbt | cut -d \" -f2)"
+  - git tag "$(version)"
   # `clean` to remove the profiling overhead added to the
   # classes for generating the coverage info during test
   - sbt clean sclinterJVM/assembly sclinterJS/fullOptJS
@@ -44,3 +45,4 @@ deploy:
        JqwWpWZFm8k="
   on:
     repo: scaledata/sclinter
+    condition: $(git tag -l $(version) == $(version))
