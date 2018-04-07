@@ -5,12 +5,3 @@
 *~
 
 target
-js/target
-
-!jvm/target/
-jvm/target/*
-
-!jvm/target/scala-2.12/
-jvm/target/scala-2.12/*
-
-!jvm/target/scala-2.12/sclinter-assembly-0.1.jar
