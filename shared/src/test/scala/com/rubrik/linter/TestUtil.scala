@@ -97,4 +97,8 @@ object TestUtil extends Matchers {
 
     new LintResultInspector { def lintResults: Seq[LintResult] = results }
   }
+
+  def descriptor(obj: AnyRef): String = {
+    obj.getClass.getSimpleName.stripSuffix("$")
+  }
 }

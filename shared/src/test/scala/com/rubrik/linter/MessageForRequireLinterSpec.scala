@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.descriptor
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
@@ -10,7 +11,7 @@ class MessageForRequireLinterSpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of MessageForRequireLinter.getClass.getSimpleName.init
+  behavior of descriptor(MessageForRequireLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError { "require(condition, message)" }

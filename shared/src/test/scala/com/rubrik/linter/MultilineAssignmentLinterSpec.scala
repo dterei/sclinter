@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.descriptor
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
@@ -30,7 +31,7 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
     } shouldBe 3
   }
 
-  behavior of MultilineAssignmentLinter.getClass.getSimpleName.init
+  behavior of descriptor(MultilineAssignmentLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError { "val foo = bar" }

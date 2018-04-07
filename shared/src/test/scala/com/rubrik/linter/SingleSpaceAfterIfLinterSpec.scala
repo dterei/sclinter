@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.descriptor
 import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
@@ -11,7 +12,7 @@ class SingleSpaceAfterIfLinterSpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of SingleSpaceAfterIfLinter.getClass.getSimpleName.init
+  behavior of descriptor(SingleSpaceAfterIfLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError { "if (foo) bar" }

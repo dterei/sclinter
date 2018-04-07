@@ -1,6 +1,7 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.LintResult.Severity
+import com.rubrik.linter.TestUtil.descriptor
 import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
@@ -31,7 +32,7 @@ class ExceptionCatchArticleLinterSpec extends FlatSpec with Matchers {
   }
 
 
-  behavior of ExceptionCatchArticleLinter.getClass.getSimpleName.init
+  behavior of descriptor(ExceptionCatchArticleLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError { "an [Exception] shouldBe thrownBy foo" }

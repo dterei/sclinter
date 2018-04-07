@@ -1,5 +1,6 @@
 package com.rubrik
 
+import com.rubrik.linter.TestUtil.descriptor
 import com.rubrik.LinterApp.CommentOffPrefixes
 import com.rubrik.LinterApp.lintResults
 import com.rubrik.linter.LintResult
@@ -30,7 +31,7 @@ class LinterAppSpec extends FlatSpec with Matchers {
     tempFileContaining(sourceText)(lintResults)
   }
 
-  behavior of LinterApp.getClass.getSimpleName.init
+  behavior of descriptor(LinterApp)
 
   it should "show lint errors for syntactically incorrect code" in {
     val results = lint("object Foo ({}")

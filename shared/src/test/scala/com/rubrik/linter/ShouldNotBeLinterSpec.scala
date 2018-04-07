@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.descriptor
 import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
@@ -11,7 +12,7 @@ class ShouldNotBeLinterSpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of ShouldNotBeLinter.getClass.getSimpleName.init
+  behavior of descriptor(ShouldNotBeLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError { "List(1, 2) should not be empty" }

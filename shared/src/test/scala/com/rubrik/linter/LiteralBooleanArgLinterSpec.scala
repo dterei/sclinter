@@ -1,6 +1,7 @@
 
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.descriptor
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
@@ -11,7 +12,7 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of LiteralBooleanArgLinter.getClass.getSimpleName.init
+  behavior of descriptor(LiteralBooleanArgLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError { "add(1, 2)" }

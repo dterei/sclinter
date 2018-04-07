@@ -1,6 +1,7 @@
 
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.descriptor
 import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
@@ -12,7 +13,7 @@ class TrivialOptionLinterSpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of TrivialOptionLinter.getClass.getSimpleName.init
+  behavior of descriptor(TrivialOptionLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError { "Option(foo)" }

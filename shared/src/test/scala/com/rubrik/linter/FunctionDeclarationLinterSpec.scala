@@ -1,5 +1,6 @@
 package com.rubrik.linter
 
+import com.rubrik.linter.TestUtil.descriptor
 import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
@@ -11,7 +12,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
     }
   }
 
-  behavior of FunctionDeclarationLinter.getClass.getSimpleName.init
+  behavior of descriptor(FunctionDeclarationLinter)
 
   it should "not show lint errors for valid code" in {
     assertLintError {
