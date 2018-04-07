@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-#  .git/hooks/pre-commit
-#
-
-cd $(git rev-parse --show-toplevel)
-
-sbt sclinterJVM/assembly
-git add jvm/target/scala-2.12/sclinter-assembly-0.1.jar
