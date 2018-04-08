@@ -17,7 +17,7 @@ for arcanist.
 ## Installation
 
 #### [Download](https://github.com/scaledata/sclinter/releases/latest)
-and extract it in a folder, say `/opt/usr/lib/sclinter`
+and extract it in a folder, say `/usr/local/lib/sclinter`
 
 #### Load the linter in `.arcconfig`
 ```json
@@ -26,7 +26,7 @@ and extract it in a folder, say `/opt/usr/lib/sclinter`
   "conduit_uri": "https://example.org",
 
   "load": [
-    "/opt/usr/lib/sclinter/lint"
+    "/usr/local/lib/sclinter/lint"
   ]
 }
 ```
@@ -38,7 +38,7 @@ and extract it in a folder, say `/opt/usr/lib/sclinter`
     "scala-linter": {
       "type": "external-json",
       "include": "(\\.scala$)",
-      "external-json.script": "java -jar /opt/usr/lib/sclinter/sclitner.jar $1"
+      "external-json.script": "java -jar /usr/local/lib/sclinter/sclinter.jar $1"
     }
   }
 }
@@ -51,7 +51,7 @@ and extract it in a folder, say `/opt/usr/lib/sclinter`
     "scala-linter": {
       "type": "external-json",
       "include": "(\\.scala$)",
-      "external-json.script": "node /opt/usr/lib/sclinter/sclitner.js $1"
+      "external-json.script": "node /usr/local/lib/sclinter/sclinter.js $1"
     }
   }
 }
