@@ -44,4 +44,4 @@ deploy:
        JqwWpWZFm8k="
   on:
     repo: scaledata/sclinter
-    condition: '"$(git tag -l $(bash get-version.sh)" = ""'
+    condition: '"$(git tag -l $(bash get-version.sh))" = ""'
