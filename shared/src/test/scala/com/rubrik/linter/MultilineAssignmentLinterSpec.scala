@@ -5,11 +5,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): Unit = {
-    TestUtil.assertLintError(MultilineAssignmentLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = MultilineAssignmentLinter
 
   behavior of "numSpacesAfterAssignmentOp"
 
@@ -31,12 +27,12 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
     } shouldBe 3
   }
 
-  behavior of descriptor(MultilineAssignmentLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "val foo = bar" }
-    assertLintError { "val foo = for { i <- list } yield i" }
-    assertLintError {
+    TestUtil.assertLintError(linter) { "val foo = bar" }
+    TestUtil.assertLintError(linter) { "val foo = for { i <- list } yield i" }
+    TestUtil.assertLintError(linter) {
       """
         |val answer = {
         |  val seven = 7
@@ -48,7 +44,7 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |val foo = for {
         |         ^
@@ -56,7 +52,7 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
         |} yield i
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |val foo = obj.property1
         |         ^
@@ -66,7 +62,7 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show multiple lint errors correctly" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |object blah {
         |  val foo = this.that
@@ -83,8 +79,8 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "work correctly for function assignments" in {
-    assertLintError { "val square: Int => Int = x => x * x" }
-    assertLintError {
+    TestUtil.assertLintError(linter) { "val square: Int => Int = x => x * x" }
+    TestUtil.assertLintError(linter) {
       """
         |val square: Int => Int = x => {
         |                        ^
@@ -95,7 +91,7 @@ class MultilineAssignmentLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "work correctly with type annotations" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |val foo: Int = List(1, 2, 3)
         |              ^

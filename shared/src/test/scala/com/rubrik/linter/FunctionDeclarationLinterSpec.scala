@@ -1,28 +1,23 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.TestUtil.descriptor
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(FunctionDeclarationLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = FunctionDeclarationLinter
 
-  behavior of descriptor(FunctionDeclarationLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def square(x: Int): Int = {
         |  x * x
         |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def multiply(
         |  x: Int,
@@ -32,7 +27,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def curried(
         |  x: Int,
@@ -45,7 +40,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def curried(
         |  x: Int,
@@ -55,7 +50,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def curried(
         |  x: Int,
@@ -65,14 +60,14 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
-    assertLintError { "def answer: Int = 42" }
-    assertLintError { "def answer[T]: Int = 42" }
-    assertLintError { "def getAnswer(): Int = 42" }
-    assertLintError { "def getAnswer[T](): Int = 42" }
+    TestUtil.assertLintError(linter) { "def answer: Int = 42" }
+    TestUtil.assertLintError(linter) { "def answer[T]: Int = 42" }
+    TestUtil.assertLintError(linter) { "def getAnswer(): Int = 42" }
+    TestUtil.assertLintError(linter) { "def getAnswer[T](): Int = 42" }
   }
 
   it should "show lint error for malformed frown" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def multiply(
         |  x: Int,
@@ -83,7 +78,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def multiply(x: Int, y: Int)
         |                           ^
@@ -93,13 +88,13 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint error for omitting return type" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def multiply(x: Int,  y: Int) = x * y
         |    ^
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def answer = 42
         |    ^
@@ -108,7 +103,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint error for mis-indented closing paren" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def multiply(
         |  x: Int,
@@ -119,7 +114,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def multiply(
         |  x: Int,
@@ -129,7 +124,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
         |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def multiply(
         |              x: Int,
@@ -143,7 +138,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint error for using Unit-returning special syntax" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |def greet(name: String) {
         |    ^
@@ -154,7 +149,7 @@ class FunctionDeclarationLinterSpec extends FlatSpec with Matchers {
       FunctionDeclarationLinter.ReturnTypeCode
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       s"""
         |def printAddition(
         |    ^

@@ -1,29 +1,24 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.TestUtil.descriptor
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(ChainedMethodsLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = ChainedMethodsLinter
 
-  behavior of descriptor(ChainedMethodsLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.bar.blah(
          |  arg1,
          |  arg2
          |)
       """
     }
-    assertLintError { "foo.bar.blah(arg1, arg2).what()" }
-    assertLintError {
+    TestUtil.assertLintError(linter) { "foo.bar.blah(arg1, arg2).what()" }
+    TestUtil.assertLintError(linter) {
       """|foo.bar.blah.that
          |  .func(
          |    arg1,
@@ -34,7 +29,7 @@ class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.bar.blah(
          |^
          |  arg1,
@@ -45,7 +40,7 @@ class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
       ChainedMethodsLinter.ownLineMessage(List("blah", "length"))
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.bar()
          |^
          | .blah(arg)
@@ -54,7 +49,7 @@ class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
       ChainedMethodsLinter.ownLineMessage(List("bar", "blah"))
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.attr1.attr2
          |^
          |  .attr3.attr4
@@ -64,7 +59,7 @@ class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
       ChainedMethodsLinter.ownLineMessage(List("attr3", "attr4", "method"))
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|val foo = this.that()
          |          ^
          |  .size
@@ -73,7 +68,7 @@ class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
       ChainedMethodsLinter.ownLineMessage(List("that", "size"))
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo
          |^
          |  .bar()
@@ -88,7 +83,7 @@ class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show multiple lint errors correctly" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|object blah {
          |  foo.bar.blah(
          |  ^
@@ -113,7 +108,7 @@ class ChainedMethodsLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint error for aligned, but mis-indented chain" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|fooBar
          |^
          |   .blah

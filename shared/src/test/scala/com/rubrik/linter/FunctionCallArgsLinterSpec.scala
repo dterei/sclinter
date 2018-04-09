@@ -5,32 +5,28 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): Unit = {
-    TestUtil.assertLintError(FunctionCallArgsLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = FunctionCallArgsLinter
 
-  behavior of descriptor(FunctionCallArgsLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "foo()" }
-    assertLintError { "this.foo(arg1, arg2)" }
-    assertLintError { "foo(arg1, arg2)" }
-    assertLintError {
+    TestUtil.assertLintError(linter) { "foo()" }
+    TestUtil.assertLintError(linter) { "this.foo(arg1, arg2)" }
+    TestUtil.assertLintError(linter) { "foo(arg1, arg2)" }
+    TestUtil.assertLintError(linter) {
       """
         |foo(
         |  arg1, arg2, arg3)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo(
         |  arg1, arg2, arg3
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo(
         |  arg1,
@@ -39,7 +35,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo(
         |  arg1,
@@ -47,7 +43,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  arg3)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |!foo(
         |  arg1,
@@ -55,7 +51,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  arg3)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |val nagativeSum =
         |  - sum(
@@ -64,7 +60,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  )
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this.that.which.foo(
         |  arg1,
@@ -73,21 +69,21 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this.that.which.foo(
         |  arg1, arg2, arg3
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this
         |  .that
         |  .func(arg1, arg2, arg3)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |!this
         |  .that
@@ -97,7 +93,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |    arg3)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |val negativeSum =
         |  - myList
@@ -105,7 +101,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |    .reduce(_ + _)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this
         |  .that
@@ -113,7 +109,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |    arg1, arg2, arg3)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this
         |  .that[String]
@@ -124,7 +120,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  )
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this
         |  .that[String]
@@ -137,7 +133,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  )
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this
         |  .that[String]
@@ -147,7 +143,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  }
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |throw RequestFailedException(
         |  message = "oh poor request! what a failure!",
@@ -155,7 +151,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |return makeMirchiBhajji(
         |  chickPeaBatter,
@@ -166,14 +162,14 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |func(arg1,
         |^
         |  arg2)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo(
         |^
@@ -182,7 +178,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo(
         |^
@@ -192,7 +188,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this.foo(
         |     ^
@@ -202,7 +198,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this
         |  .foo(
@@ -216,7 +212,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint error for aligned but mis-indented args" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this
         |  .foo(
@@ -226,7 +222,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo(
         |^
@@ -234,7 +230,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |    arg2)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this.that.which.what(
         |                ^
@@ -242,7 +238,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |                     arg2)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |this.that.which.what(
         |                ^
@@ -250,7 +246,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |                 arg2)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |throw RequestFailedException(
         |      ^
@@ -262,7 +258,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show multiple lint errors correctly" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |object blah {
         |  func1(
@@ -279,7 +275,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "work correctly with type params" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo
         |  .bar[Int](arg1,
@@ -288,7 +284,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |  )
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |foo.bar[Int](arg1,
         |    ^
@@ -296,7 +292,7 @@ class FunctionCallArgsLinterSpec extends FlatSpec with Matchers {
         |)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |bar[Int](arg1,
         |^

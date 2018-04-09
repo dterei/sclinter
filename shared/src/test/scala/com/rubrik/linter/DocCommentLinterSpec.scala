@@ -1,21 +1,16 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.TestUtil.descriptor
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class DocCommentLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(DocCommentLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = DocCommentLinter
 
-  behavior of descriptor(DocCommentLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |/**
         | * Amazing documentation
@@ -24,7 +19,7 @@ class DocCommentLinterSpec extends FlatSpec with Matchers {
         |case class AdequatelyDocumentedClass(exists: Boolean)
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |package object outer {
         |  /**
@@ -38,7 +33,7 @@ class DocCommentLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |/**
         |^
@@ -58,7 +53,7 @@ class DocCommentLinterSpec extends FlatSpec with Matchers {
         .trim
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |package object outer {
         |  /**

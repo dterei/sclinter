@@ -1,7 +1,10 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.LintResult.Severity
+import org.scalactic.source
 import org.scalatest.Matchers
+import org.scalatest.exceptions.StackDepthException
+import org.scalatest.exceptions.TestFailedException
 import scala.meta.Stat
 import scala.meta.XtensionParseInputLike
 
@@ -10,6 +13,11 @@ import scala.meta.XtensionParseInputLike
  * @param col 1 based index
  */
 case class Caret(line: Int, col: Int)
+
+object Caret {
+  def fromLintResult(lintResult: LintResult): Caret =
+    Caret(lintResult.line, lintResult.char)
+}
 
 case class CodeSpec private(code: Stat, carets: Seq[Caret])
 
@@ -84,14 +92,76 @@ object TestUtil extends Matchers {
     }
   }
 
-  def assertLintError(linter: Linter)(code: String): LintResultInspector = {
+  def assertLintError(
+    linter: Linter
+  )(
+    code: String
+  )(
+    implicit file: sourcecode.File,
+    line: sourcecode.Line,
+    fullName: sourcecode.FullName
+  ): LintResultInspector = {
     val codeSpec = CodeSpec(code)
     val expectedCarets: Set[Caret] = codeSpec.carets.toSet
     val results: Seq[LintResult] = linter.lint(codeSpec.code)
-    val carets: Set[Caret] =
-      results.map(error => Caret(error.line, error.char)).toSet
+    val reportedCarets: Set[Caret] = results.map(Caret.fromLintResult).toSet
+    val unreportedCarets = expectedCarets -- reportedCarets
+    val unexpectedCarets = reportedCarets -- expectedCarets
+    val fileName = file.value.split("/").last
+    val test = fullName.value
 
-    carets shouldBe expectedCarets
+    def numCaretLinesBefore(lineNum: Int): Int = {
+      expectedCarets.map(_.line).count(_ < lineNum)
+    }
+
+    def lineInFile(caret: Caret): Int = {
+      line.value + caret.line + numCaretLinesBefore(caret.line)
+    }
+
+    unreportedCarets.headOption.foreach {
+      unreported =>
+        val unexpected = unexpectedCarets.filter(_.line == unreported.line)
+        val lineNum = lineInFile(unreported)
+
+        val messageFun: StackDepthException => Option[String] =
+          _ => Some {
+            s"Expected lint at column ${unreported.col}; but found " +
+              (if (unexpected.isEmpty) {
+                "none "
+              } else {
+                s"on columns ${unexpected.map(_.col).mkString(", ")} "
+              }) +
+              "instead." +
+              // IntelliJ's test-output parsing idiosyncrasies dictate us
+              // to include the following line for easy error navigation:
+              s"\n\tat $test ($fileName:$lineNum)\n"
+          }
+
+        val position = source.Position(fileName, file.value, lineNum)
+        throw new TestFailedException(messageFun, pos = position, cause = None)
+    }
+
+    unexpectedCarets.headOption.foreach {
+      unexpected =>
+        val lineNum = lineInFile(unexpected)
+        val position = source.Position(fileName, file.value, lineNum)
+        results
+          .find(res => Caret.fromLintResult(res) == unexpected)
+          .map(_.message)
+          .foreach {
+            message =>
+              val messageFun: StackDepthException => Option[String] =
+                _ => Some {
+                  s"The following lint message wasn't expected " +
+                    s"at column ${unexpected.col}:\n\n$message" +
+                    // IntelliJ's test-output parsing idiosyncrasies dictate us
+                    // to include the following line for easy error navigation:
+                    s"\n\tat $test ($fileName:$lineNum)\n"
+                }
+              val cause = None
+              throw new TestFailedException(messageFun, cause, position)
+          }
+    }
 
     new LintResultInspector { def lintResults: Seq[LintResult] = results }
   }

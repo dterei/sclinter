@@ -2,7 +2,6 @@ package com.rubrik.linter
 
 import com.rubrik.linter.LintResult.Severity
 import com.rubrik.linter.TestUtil.descriptor
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 import scala.meta.XtensionParseInputLike
@@ -10,11 +9,7 @@ import scala.meta.Stat
 import scala.meta.Term.ApplyType
 
 class ExceptionCatchArticleLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(ExceptionCatchArticleLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = ExceptionCatchArticleLinter
 
   behavior of "ExceptionCatchArticleLinter.incorrectSpace"
 
@@ -32,16 +27,16 @@ class ExceptionCatchArticleLinterSpec extends FlatSpec with Matchers {
   }
 
 
-  behavior of descriptor(ExceptionCatchArticleLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "an [Exception] shouldBe thrownBy foo" }
-    assertLintError { "a [RuntimeError] shouldBe thrownBy foo" }
-    assertLintError { "val err = the [RuntimeError] thrownBy foo" }
+    TestUtil.assertLintError(linter) { "an [Exception] shouldBe thrownBy foo" }
+    TestUtil.assertLintError(linter) { "a [RuntimeError] shouldBe thrownBy foo" }
+    TestUtil.assertLintError(linter) { "val err = the [RuntimeError] thrownBy foo" }
   }
 
   it should "correctly suggest article change" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |a [UnidentifiedException] shouldBe thrownBy foo
         |^
@@ -52,7 +47,7 @@ class ExceptionCatchArticleLinterSpec extends FlatSpec with Matchers {
       Severity.Advice
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |an [RuntimeException] shouldBe thrownBy foo
         |^
@@ -65,7 +60,7 @@ class ExceptionCatchArticleLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "correctly suggest correct spacing" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |an[Exception] shouldBe thrownBy foo
         |^
@@ -74,7 +69,7 @@ class ExceptionCatchArticleLinterSpec extends FlatSpec with Matchers {
       "an [Exception]"
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |val err = the  [Exception] thrownBy foo
         |          ^
@@ -83,7 +78,7 @@ class ExceptionCatchArticleLinterSpec extends FlatSpec with Matchers {
       "the [Exception]"
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |a[ RuntimeError ] shouldBe thrownBy foo
         |^

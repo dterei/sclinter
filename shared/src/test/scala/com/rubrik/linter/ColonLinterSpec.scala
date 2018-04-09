@@ -1,38 +1,33 @@
 package com.rubrik.linter
 
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class ColonLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(ColonLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = ColonLinter
 
   behavior of "ColonLinter"
 
   it should "not show lint errors for valid code" in {
     // correct space around colon token
-    assertLintError { "val i: Int" }
+    TestUtil.assertLintError(linter) { "val i: Int" }
 
     // nothing to do with the colon token
-    assertLintError { "list1 :+ list2" }
-    assertLintError { "head :: tail" }
+    TestUtil.assertLintError(linter) { "list1 :+ list2" }
+    TestUtil.assertLintError(linter) { "head :: tail" }
 
     // Simply ignore if first / last non-whitespace token on line
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer()
          |: Int = 42
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer():
          |    Int = 42
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer()
          |  :
          |    Int = 42
@@ -41,32 +36,32 @@ class ColonLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer:Int = 42
          |          ^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer  :Int = 42
          |          ^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer  :   Int = 42
          |          ^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer  :
          |          ^
          |  Int = 42
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|def answer
          |:Int = 42
          |^

@@ -2,27 +2,22 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.TestUtil.descriptor
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class TrivialOptionLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(TrivialOptionLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = TrivialOptionLinter
 
-  behavior of descriptor(TrivialOptionLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "Option(foo)" }
+    TestUtil.assertLintError(linter) { "Option(foo)" }
   }
 
   it should "show lint errors for invalid code" in {
     List("true", "false", "\"literal string\"", "1", "1L", "'c'").foreach {
       arg =>
-        assertLintError {
+        TestUtil.assertLintError(linter) {
           s"""{ Option($arg) }
              |  ^
             """
@@ -31,7 +26,7 @@ class TrivialOptionLinterSpec extends FlatSpec with Matchers {
         }
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       s"""{ Option(null) }
          |  ^
         """

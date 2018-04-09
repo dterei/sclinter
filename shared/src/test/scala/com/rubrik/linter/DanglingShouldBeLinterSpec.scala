@@ -1,25 +1,20 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.TestUtil.descriptor
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class DanglingShouldBeLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(DanglingShouldBeLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = DanglingShouldBeLinter
 
-  behavior of descriptor(DanglingShouldBeLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "foo should be (bar)" }
+    TestUtil.assertLintError(linter) { "foo should be (bar)" }
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |object AppTest {
         |  foo should be
@@ -29,7 +24,7 @@ class DanglingShouldBeLinterSpec extends FlatSpec with Matchers {
       """
     } withReplacementTexts { "foo shouldBe" }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |object AppTest {
         |  an [Error] should be thrownBy {
@@ -40,7 +35,7 @@ class DanglingShouldBeLinterSpec extends FlatSpec with Matchers {
       """
     } withReplacementTexts { "an [Error] shouldBe" }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |object AppTest {
         |  an [Error] should

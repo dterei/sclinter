@@ -1,80 +1,75 @@
 package com.rubrik.linter
 
 import com.rubrik.linter.TestUtil.descriptor
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class NewDateLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(NewDateLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = NewDateLinter
 
-  behavior of descriptor(NewDateLinter)
+  behavior of descriptor(linter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "new Date(arg)" }
-    assertLintError { "new DateTime(arg)" }
+    TestUtil.assertLintError(linter) { "new Date(arg)" }
+    TestUtil.assertLintError(linter) { "new DateTime(arg)" }
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|new Date()
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|new Date
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|new DateTime()
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|new DateTime
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|DateTime.now
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|DateTime.now()
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|DateTime.now(arg)
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|Instant.now
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|Instant.now()
          |^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|Instant.now(arg)
          |^
       """

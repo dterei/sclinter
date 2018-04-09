@@ -6,22 +6,18 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): Unit = {
-    TestUtil.assertLintError(LiteralBooleanArgLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = LiteralBooleanArgLinter
 
   behavior of descriptor(LiteralBooleanArgLinter)
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "add(1, 2)" }
-    assertLintError { "deleteAll(folder, really = true)" }
-    assertLintError { "deleteAll(folder, true /* really */)" }
-    assertLintError { "booleanOpt.getOrElse(true)"}
-    assertLintError { "Seq(true, false)"}
+    TestUtil.assertLintError(linter) { "add(1, 2)" }
+    TestUtil.assertLintError(linter) { "deleteAll(folder, really = true)" }
+    TestUtil.assertLintError(linter) { "deleteAll(folder, true /* really */)" }
+    TestUtil.assertLintError(linter) { "booleanOpt.getOrElse(true)"}
+    TestUtil.assertLintError(linter) { "Seq(true, false)"}
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |request(
         |  "sick leave",
@@ -31,7 +27,7 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |request(
         |  "unlimited vacation",
@@ -43,14 +39,14 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |deleteAll(folder, true)
         |                  ^
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |request(
         |  "sick leave",
@@ -61,7 +57,7 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |request(
         |  "sick leave",
@@ -72,7 +68,7 @@ class LiteralBooleanArgLinterSpec extends FlatSpec with Matchers {
       """
     }
 
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """
         |request(
         |  "sick leave",

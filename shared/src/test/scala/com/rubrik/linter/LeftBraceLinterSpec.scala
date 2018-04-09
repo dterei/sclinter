@@ -1,26 +1,21 @@
 package com.rubrik.linter
 
-import com.rubrik.linter.TestUtil.LintResultInspector
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class LeftBraceLinterSpec extends FlatSpec with Matchers {
-  private def assertLintError(code: String): LintResultInspector = {
-    TestUtil.assertLintError(LeftBraceLinter) {
-      code.stripMargin
-    }
-  }
+  val linter: Linter = LeftBraceLinter
 
   behavior of "LeftBraceLinter"
 
   it should "not show lint errors for valid code" in {
-    assertLintError { "import foo.bar.{blah => bloop}" }
-    assertLintError { s"""println(s"hello $${world.name}")""" }
-    assertLintError { "foo.map { case blah => _ }" }
+    TestUtil.assertLintError(linter) { "import foo.bar.{blah => bloop}" }
+    TestUtil.assertLintError(linter) { s"""println(s"hello $${world.name}")""" }
+    TestUtil.assertLintError(linter) { "foo.map { case blah => _ }" }
 
 
     // Simply ignore if first / last non-whitespace token on line
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|val answer = {
          |  42
          |}
@@ -29,34 +24,34 @@ class LeftBraceLinterSpec extends FlatSpec with Matchers {
   }
 
   it should "show lint errors for invalid code" in {
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|val answer = this.synchronized{
          |                              ^
          |  42
          |}
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|{42}
          |^
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.map{ case blah => _ }
          |       ^
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.map  { case blah => _ }
          |       ^
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.map{case blah => _ }
          |       ^
       """
     }
-    assertLintError {
+    TestUtil.assertLintError(linter) {
       """|foo.map {case blah => _ }
          |       ^
       """
