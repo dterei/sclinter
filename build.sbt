@@ -12,7 +12,7 @@ lazy val sclinter =
       libraryDependencies ++= Seq(
         "com.beachape" %%% "enumeratum" % "1.5.12",
         "com.lihaoyi" %%% "upickle" % "0.6.2",
-        "org.scalameta" %%% "scalameta" % "2.1.3",
+        "org.scalameta" %%% "scalameta" % "3.7.0",
         "org.scalatest" %%% "scalatest" % "3.0.4" % "test",
       ),
 
