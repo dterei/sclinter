@@ -14,7 +14,7 @@ before_deploy:
   # Set up git user name and tag this commit
   - git config --local user.name "Sujeet Kausallya Gholap"
   - git config --local user.email "sujeetgholap+travis@gmail.com"
-  - git tag "$(get-version.sh)"
+  - git tag "$(bash get-version.sh)"
   # `clean` to remove the profiling overhead added to the
   # classes for generating the coverage info during test
   - sbt clean sclinterJVM/assembly sclinterJS/fullOptJS
@@ -44,4 +44,4 @@ deploy:
        JqwWpWZFm8k="
   on:
     repo: scaledata/sclinter
-    condition: $(git tag -l $(get-version.sh) == $(get-version.sh))
+    condition: $(git tag -l $(bash get-version.sh) == $(bash get-version.sh))
