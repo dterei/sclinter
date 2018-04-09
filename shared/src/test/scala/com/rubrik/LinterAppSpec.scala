@@ -18,8 +18,8 @@ class LinterAppSpec extends FlatSpec with Matchers {
   it should "show lint errors for syntactically incorrect code" in {
     val results = lint("object Foo ({}")
     results should have size 1
-    results.head.line shouldBe Some(1)
-    results.head.char shouldBe Some(12)
+    results.head.line shouldBe 1
+    results.head.char shouldBe 12
   }
 
   it should "ignore lint errors for lines with disabled lint" in {

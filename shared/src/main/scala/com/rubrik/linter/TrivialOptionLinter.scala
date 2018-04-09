@@ -26,8 +26,8 @@ object TrivialOptionLinter extends Linter {
         LintResult(
           code = Some("USE-SOME"),
           severity = Some(Severity.Warning),
-          line = Some(opt.pos.startLine + 1),
-          char = Some(opt.pos.startColumn + 1),
+          line = opt.pos.startLine + 1,
+          char = opt.pos.startColumn + 1,
           original = Some(opt.syntax),
           replacement = Some(replacement),
           message =

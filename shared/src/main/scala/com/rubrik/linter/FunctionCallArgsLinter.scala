@@ -102,8 +102,8 @@ object FunctionCallArgsLinter extends Linter {
         message = message,
         code = Some("FUNCTION-CALL-ARGS"),
         name = Some("Function call arguments"),
-        line = Some(method.pos.startLine + 1),
-        char = Some(method.pos.startColumn + 1))
+        line = method.pos.startLine + 1,
+        char = method.pos.startColumn + 1)
     }
   }
 

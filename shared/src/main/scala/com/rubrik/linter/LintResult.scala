@@ -9,13 +9,13 @@ import enumeratum.EnumEntry
 import scala.collection.immutable.IndexedSeq
 
 /**
- * @param file Path of the file being linted.
- * @param message Text describing the lint message. For example,
- *                "This is a syntax error.".
- * @param name Text summarizing the lint message. For example, "Syntax Error".
- * @param severity [[Severity]] of the lint message.
  * @param line The line number of the message (starts with 1, not 0).
  * @param char The character offset of the message (starts with 1).
+ * @param message Text describing the lint message. For example,
+ *                "This is a syntax error.".
+ * @param file Path of the file being linted.
+ * @param name Text summarizing the lint message. For example, "Syntax Error".
+ * @param severity [[Severity]] of the lint message.
  * @param original The text the message affects.
  * @param replacement The text that should replace [[original]] to resolve
  *                    the message.
@@ -28,11 +28,11 @@ import scala.collection.immutable.IndexedSeq
  */
 case class LintResult(
   message: String,
+  line: Int,
+  char: Int,
   file: Option[String] = None,
   name: Option[String] = None,
   severity: Option[Severity] = None,
-  line: Option[Int] = None,
-  char: Option[Int] = None,
   original: Option[String] = None,
   replacement: Option[String] = None,
   code: Option[String] = None

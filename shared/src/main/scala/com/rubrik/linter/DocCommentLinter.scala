@@ -39,8 +39,8 @@ object DocCommentLinter extends Linter {
           message = "Documentation comments must follow javadoc style",
           code = Some("JAVADOC"),
           name = Some("Follow javadoc style"),
-          line = Some(comment.pos.startLine + 1),
-          char = Some(comment.pos.startColumn + 1),
+          line = comment.pos.startLine + 1,
+          char = comment.pos.startColumn + 1,
           original = Some(actual),
           replacement = Some(expected)))
     }

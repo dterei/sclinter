@@ -62,8 +62,8 @@ object LiteralBooleanArgLinter extends Linter {
               """.stripMargin,
             code = Some("BOOLEAN-LITERAL-ARG"),
             name = Some("Always name boolean literal args"),
-            line = Some(arg.pos.startLine + 1),
-            char = Some(arg.pos.startColumn + 1))
+            line = arg.pos.startLine + 1,
+            char = arg.pos.startColumn + 1)
       }
   }
 

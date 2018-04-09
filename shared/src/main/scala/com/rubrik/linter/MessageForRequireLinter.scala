@@ -20,8 +20,8 @@ object MessageForRequireLinter extends Linter {
               "A message string should be the second argument for `require`.",
             code = Some("REQUIRE-MESSAGE"),
             name = Some("Message needed for `require`"),
-            line = Some(funCall.pos.startLine + 1),
-            char = Some(funCall.pos.startColumn + 1))
+            line = funCall.pos.startLine + 1,
+            char = funCall.pos.startColumn + 1)
       }
   }
 }

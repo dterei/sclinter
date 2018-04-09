@@ -27,8 +27,8 @@ object NewDateLinter extends Linter {
     LintResult(
       code = Some("NO-NEW-DATE"),
       severity = Some(Severity.Warning),
-      line = Some(newCall.pos.startLine + 1),
-      char = Some(newCall.pos.startColumn + 1),
+      line = newCall.pos.startLine + 1,
+      char = newCall.pos.startColumn + 1,
       message = "Inject a clock to use something like `clock.now` instead.")
   }
 

@@ -63,8 +63,8 @@ abstract class SpacesAroundTokenLinter[T <: Token: ClassTag](
                 original = Some(actualString),
                 replacement = Some(expectedString),
                 code = Some("SPACES-AROUND-TOKEN"),
-                line = Some(actualTokens.head.pos.startLine + 1),
-                char = Some(actualTokens.head.pos.startColumn + 1),
+                line = actualTokens.head.pos.startLine + 1,
+                char = actualTokens.head.pos.startColumn + 1,
                 message =
                   s"`${token.syntax}` should have $numSpacesBefore spaces " +
                     s"before and $numSpacesAfter spaces after."))

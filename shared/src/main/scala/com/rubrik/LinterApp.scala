@@ -74,7 +74,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 
       linters
         .flatMap(_.lint(source))
-        .filterNot(_.line.exists(lineNosToIgnore))
+        .filterNot(result => lineNosToIgnore.contains(result.line))
         .map(_.copy(file = Some(path)))
         // TODO(sujeet): once we're ready for errors to appear
         // in parts of file that aren't touched in a diff, stop
@@ -99,8 +99,8 @@ import scala.scalajs.js.annotation.JSExportTopLevel
             code = Some("SYNTAX-ERROR"),
             name = Some("Scala syntax error"),
             severity = Some(Severity.Error),
-            line = Some(e.pos.startLine + 1),
-            char = Some(e.pos.startColumn + 1)))
+            line = e.pos.startLine + 1,
+            char = e.pos.startColumn + 1))
     }
   }
 

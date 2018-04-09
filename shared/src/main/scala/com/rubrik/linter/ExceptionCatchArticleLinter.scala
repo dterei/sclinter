@@ -40,8 +40,8 @@ object ExceptionCatchArticleLinter extends Linter {
           message = s"Should `an` be used instead of `a`?",
           code = Some("EXCEPTION-TYPE-ARTICLE"),
           name = Some("Article used for exception type"),
-          line = Some(expr.pos.startLine + 1),
-          char = Some(expr.pos.startColumn + 1),
+          line = expr.pos.startLine + 1,
+          char = expr.pos.startColumn + 1,
           original = Some(expr.syntax),
           severity = Some(Severity.Advice),
           replacement = Some(s"an [$exceptionType]")))
@@ -60,8 +60,8 @@ object ExceptionCatchArticleLinter extends Linter {
           message = s"`a` should be used instead of `an`.",
           code = Some("EXCEPTION-TYPE-ARTICLE"),
           name = Some("Article used for exception type"),
-          line = Some(expr.pos.startLine + 1),
-          char = Some(expr.pos.startColumn + 1),
+          line = expr.pos.startLine + 1,
+          char = expr.pos.startColumn + 1,
           original = Some(expr.syntax),
           severity = Some(Severity.Error),
           replacement = Some(s"a [$exceptionType]")))
@@ -102,8 +102,8 @@ object ExceptionCatchArticleLinter extends Linter {
           s"and `[$typ]`.",
       code = Some("EXCEPTION-TYPE-ARTICLE-SPACE"),
       name = Some(s"Space between '$article' and '[$typ]'"),
-      line = Some(article.pos.startLine + 1),
-      char = Some(article.pos.startColumn + 1),
+      line = article.pos.startLine + 1,
+      char = article.pos.startColumn + 1,
       original = Some(expr.syntax),
       severity = Some(Severity.Error),
       replacement = Some(s"$article [$typ]"))

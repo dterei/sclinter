@@ -45,8 +45,8 @@ object ShouldNotBeLinter extends Linter {
               name = Some("Avoid `should not be`"),
               original = Some(stmt.syntax),
               replacement = Some(stmt.syntax.replaceFirst(" be ", " equal ")),
-              line = Some(stmt.pos.startLine + 1),
-              char = Some(stmt.pos.startColumn + 1)))
+              line = stmt.pos.startLine + 1,
+              char = stmt.pos.startColumn + 1))
       }
       .flatten
   }

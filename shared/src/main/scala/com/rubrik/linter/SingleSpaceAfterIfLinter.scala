@@ -24,8 +24,8 @@ object SingleSpaceAfterIfLinter extends Linter {
               "and the opening parenthesis",
           code = Some("ONE-SPACE-AFTER-IF"),
           name = Some("Single space after 'if'"),
-          line = Some(stmt.pos.startLine + 1),
-          char = Some(stmt.pos.startColumn + 1),
+          line = stmt.pos.startLine + 1,
+          char = stmt.pos.startColumn + 1,
           original = Some(stmt.syntax),
           replacement = Some(replacementText(stmt))))
     }

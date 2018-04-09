@@ -42,8 +42,8 @@ object DanglingShouldBeLinter extends Linter {
       LintResult(
         message = "use `shouldBe` instead of `should be`",
         code = Some("NO-SHOULD-BE"),
-        line = Some(shouldBeInstance.pos.startLine + 1),
-        char = Some(shouldBeInstance.pos.startColumn + 1),
+        line = shouldBeInstance.pos.startLine + 1,
+        char = shouldBeInstance.pos.startColumn + 1,
         original = Some(actual),
         replacement = Some(expected)))
   }

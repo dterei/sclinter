@@ -86,8 +86,8 @@ object ChainedMethodsLinter extends Linter {
             message = message,
             code = Some("CHAIN-ALIGN"),
             name = Some("Multiline method chaining"),
-            line = Some(callChain.pos.startLine + 1),
-            char = Some(callChain.pos.startColumn + 1)))
+            line = callChain.pos.startLine + 1,
+            char = callChain.pos.startColumn + 1))
     }
   }
 

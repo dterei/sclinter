@@ -55,8 +55,8 @@ object MultilineAssignmentLinter extends Linter {
       message = "Break line after the assignment operator (=)",
       code = Some("NEWLINE-POST-ASSIGN"),
       name = Some("Multiline assignment"),
-      line = Some(expr.pos.startLine + 1),
-      char = Some(expr.pos.startColumn - numSpacesAfterAssignmentOp(stmt) + 1),
+      line = expr.pos.startLine + 1,
+      char = expr.pos.startColumn - numSpacesAfterAssignmentOp(stmt) + 1,
       original = Some(" " * numSpacesAfterAssignmentOp(stmt) + expr.syntax),
       replacement = Some(replacementText(variable, expr)))
   }

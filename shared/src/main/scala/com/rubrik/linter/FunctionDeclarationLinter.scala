@@ -50,8 +50,8 @@ object FunctionDeclarationLinter extends Linter {
                       "making a reverse frown like `):`",
                   code = Some(ReverseFrownCode),
                   name = Some("Function def reverse-frown"),
-                  line = Some(rParen.pos.startLine + 1),
-                  char = Some(rParen.pos.startColumn + 1)))
+                  line = rParen.pos.startLine + 1,
+                  char = rParen.pos.startColumn + 1))
             }
             // Found the reverse frown, but is it indented correctly?
             else if (
@@ -69,8 +69,8 @@ object FunctionDeclarationLinter extends Linter {
                       s"`${firstNonEmptyToken(defn)}`.",
                   code = Some(ClosingParenIndentCode),
                   name = Some("Function def closing parenthesis indent"),
-                  line = Some(rParen.pos.startLine + 1),
-                  char = Some(rParen.pos.startColumn + 1)))
+                  line = rParen.pos.startLine + 1,
+                  char = rParen.pos.startColumn + 1))
 
             } else {
               None
@@ -88,8 +88,8 @@ object FunctionDeclarationLinter extends Linter {
             message = s"Return type not specified for `$func`.",
             code = Some(ReturnTypeCode),
             name = Some("Function return type"),
-            line = Some(func.pos.startLine + 1),
-            char = Some(func.pos.startColumn + 1)))
+            line = func.pos.startLine + 1,
+            char = func.pos.startColumn + 1))
       }
   }
 

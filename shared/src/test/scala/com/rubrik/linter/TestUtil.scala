@@ -89,9 +89,7 @@ object TestUtil extends Matchers {
     val expectedCarets: Set[Caret] = codeSpec.carets.toSet
     val results: Seq[LintResult] = linter.lint(codeSpec.code)
     val carets: Set[Caret] =
-      results
-        .map(error => Caret(error.line.get, error.char.get))
-        .toSet
+      results.map(error => Caret(error.line, error.char)).toSet
 
     carets shouldBe expectedCarets
 
