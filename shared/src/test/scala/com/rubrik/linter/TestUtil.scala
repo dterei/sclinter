@@ -5,8 +5,11 @@ import org.scalactic.source
 import org.scalatest.Matchers
 import org.scalatest.exceptions.StackDepthException
 import org.scalatest.exceptions.TestFailedException
+import scala.meta.Source
 import scala.meta.Stat
+import scala.meta.Tree
 import scala.meta.XtensionParseInputLike
+import scala.meta.parsers.ParseException
 
 /**
  * @param line 1 based index
@@ -19,18 +22,23 @@ object Caret {
     Caret(lintResult.line, lintResult.char)
 }
 
-case class CodeSpec private(code: Stat, carets: Seq[Caret])
+case class CodeSpec private(code: Tree, carets: Seq[Caret])
 
 object CodeSpec {
   def apply(raw: String): CodeSpec = {
-    val code: Stat =
-      raw
-        .stripMargin
-        .split("\n")
-        .filterNot(_.contains("^"))
-        .mkString("\n")
-        .parse[Stat]
-        .get
+    val code: Tree = {
+      val codeWithoutCarets =
+        raw
+          .stripMargin
+          .split("\n")
+          .filterNot(_.contains("^"))
+          .mkString("\n")
+      try {
+        codeWithoutCarets.parse[Stat].get
+      } catch {
+        case _: ParseException => codeWithoutCarets.parse[Source].get
+      }
+    }
 
     val carets: Seq[Caret] =
       raw
