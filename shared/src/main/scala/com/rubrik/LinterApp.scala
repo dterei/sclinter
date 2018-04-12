@@ -16,6 +16,7 @@ import com.rubrik.linter.LiteralBooleanArgLinter
 import com.rubrik.linter.MessageForRequireLinter
 import com.rubrik.linter.MultilineAssignmentLinter
 import com.rubrik.linter.NewDateLinter
+import com.rubrik.linter.ShadowLinter
 import com.rubrik.linter.ShouldNotBeLinter
 import com.rubrik.linter.SingleSpaceAfterIfLinter
 import com.rubrik.linter.TrivialOptionLinter
@@ -51,6 +52,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
       MessageForRequireLinter,
       MultilineAssignmentLinter,
       NewDateLinter,
+      ShadowLinter,
       ShouldNotBeLinter,
       SingleSpaceAfterIfLinter,
       TrivialOptionLinter)

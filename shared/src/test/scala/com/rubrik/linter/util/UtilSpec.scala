@@ -329,18 +329,18 @@ class UtilSpec extends FlatSpec with Matchers {
   behavior of "explicitlySpecifiedReturnType"
 
   it should "return the return type when specified" in {
-    val defn = "def foo(): Unit = {}".parse[Stat].get.asInstanceOf[Defn.Def]
-    val inferredType = defn.decltpe
-    val specifiedType = explicitlySpecifiedReturnType(defn)
+    val dfn = "def foo(): Unit = {}".parse[Stat].get.asInstanceOf[Defn.Def]
+    val inferredType = dfn.decltpe
+    val specifiedType = explicitlySpecifiedReturnType(dfn)
 
     inferredType shouldBe defined
     specifiedType shouldBe defined
   }
 
   it should "correctly catch the unit-function special syntax" in {
-    val defn = "def foo() {}".parse[Stat].get.asInstanceOf[Defn.Def]
-    val inferredType = defn.decltpe
-    val specifiedType = explicitlySpecifiedReturnType(defn)
+    val dfn = "def foo() {}".parse[Stat].get.asInstanceOf[Defn.Def]
+    val inferredType = dfn.decltpe
+    val specifiedType = explicitlySpecifiedReturnType(dfn)
 
     inferredType shouldBe defined
     specifiedType should not be defined
@@ -403,7 +403,7 @@ class UtilSpec extends FlatSpec with Matchers {
       .get
 
   it should "differentiate between partial and complete call-chains" in {
-    def isComplete(chain: Tree): Boolean = util.isCompleteCallChain(chain)
+    def isComplete(chn: Tree): Boolean = util.isCompleteCallChain(chn)
 
     // There are only two complete call chains:
     // obj.property.method.. ..lastProperty

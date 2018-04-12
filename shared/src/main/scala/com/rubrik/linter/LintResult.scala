@@ -3,7 +3,6 @@ package com.rubrik.linter
 import com.rubrik.json.OptionPickler.macroRW
 import com.rubrik.json.OptionPickler.ReadWriter
 import com.rubrik.json.OptionPickler.readwriter
-import com.rubrik.linter.LintResult.Severity
 import enumeratum.Enum
 import enumeratum.EnumEntry
 import scala.collection.immutable.IndexedSeq
@@ -15,7 +14,7 @@ import scala.collection.immutable.IndexedSeq
  *                "This is a syntax error.".
  * @param file Path of the file being linted.
  * @param name Text summarizing the lint message. For example, "Syntax Error".
- * @param severity [[Severity]] of the lint message.
+ * @param severity Severity of the lint message.
  * @param original The text the message affects.
  * @param replacement The text that should replace [[original]] to resolve
  *                    the message.
@@ -32,7 +31,7 @@ case class LintResult(
   char: Int,
   file: Option[String] = None,
   name: Option[String] = None,
-  severity: Option[Severity] = None,
+  severity: Option[LintResult.Severity] = None,
   original: Option[String] = None,
   replacement: Option[String] = None,
   code: Option[String] = None
