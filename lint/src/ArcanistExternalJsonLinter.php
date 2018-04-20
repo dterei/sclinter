@@ -124,6 +124,7 @@ final class ArcanistExternalJsonLinter extends ArcanistLinter {
    */
   public function willLintPaths(array $paths) {
     $future = new ExecFuture('%C %Ls', $this->script, $paths);
+    $future->setCWD($this->getProjectRoot());
     list($this->output) = $future->resolvex();
   }
 
